@@ -1,0 +1,101 @@
+[
+  {
+    "kod": "2CT04",
+    "megnevezes": "Égéslevegő ventilátor motor frekvenciaváltó transzformátora",
+    "helyszin": "2DB elosztóban",
+    "elosztoNev": "2BA",
+    "leagazasJel": "2BA01",
+    "elosztoHelye": "Kazánház, 0 szint, BC köz, átjáró",
+    "berendezesKep": null,
+    "elosztoKep": null,
+    "feljegyzes": null
+  },
+  {
+    "kod": "2NG01D501-G01",
+    "megnevezes": "Égéslevegő ventilátor motor frekvenciaváltó",
+    "helyszin": "2DB elosztóban",
+    "elosztoNev": "2BA",
+    "leagazasJel": "2BA01",
+    "elosztoHelye": "Kazánház, 0 szint, BC köz, átjáró",
+    "berendezesKep": null,
+    "elosztoKep": null,
+    "feljegyzes": null
+  },
+  {
+    "kod": "2NG01D501-M01",
+    "megnevezes": "Nyomóventilátor motor ",
+    "helyszin": "Kazánház, -3,8 szint, AB köz, Ny-i fal",
+    "elosztoNev": "2BA",
+    "leagazasJel": "2BA01",
+    "elosztoHelye": "Kazánház, 0 szint, BC köz, átjáró",
+    "berendezesKep": null,
+    "elosztoKep": null,
+    "feljegyzes": null
+  },
+  {
+    "kod": "2CT03",
+    "megnevezes": "2CT03 Szívó ventilátor frekvenciaváltó tranformátora",
+    "helyszin": "2. filter alatt",
+    "elosztoNev": "2BA",
+    "leagazasJel": "2BA02",
+    "elosztoHelye": "Kazánház, 0 szint, AB köz, K-i fal",
+    "berendezesKep": null,
+    "elosztoKep": null,
+    "feljegyzes": null
+  },
+  {
+    "kod": "6ND02D005",
+    "megnevezes": "É-i kihordó csiga kenőolaj szivattyú",
+    "helyszin": "Kazánház, 7,5 m, É-i napi tartály alatt",
+    "elosztoNev": "6DD",
+    "leagazasJel": "6DD4",
+    "elosztoHelye": "Kazánház, 7,5 m, DNY-i sarokban",
+    "berendezesKep": null,
+    "elosztoKep": null,
+    "feljegyzes": null
+  },
+  {
+    "kod": "6ND01D005",
+    "megnevezes": "D-i kihordó csiga kenőolaj szivattyú",
+    "helyszin": "Kazánház, 7,5 m, D-i napi tartály alatt",
+    "elosztoNev": "6DC",
+    "leagazasJel": "6DC4",
+    "elosztoHelye": "Kazánház, 7,5 m, DNY-i sarokban",
+    "berendezesKep": null,
+    "elosztoKep": null,
+    "feljegyzes": null
+  },
+  {
+    "kod": "6NC04S201",
+    "megnevezes": "Dobürítő alap tolózár",
+    "helyszin": "Kazánház , 7,5 m, 10. kazán ÉK-i sarok",
+    "elosztoNev": "6DB",
+    "leagazasJel": "6DB3",
+    "elosztoHelye": "Kazánház, 7,5 m, D-i fal",
+    "berendezesKep": null,
+    "elosztoKep": null,
+    "feljegyzes": null
+  },
+  {
+    "kod": "6DQ",
+    "megnevezes": "10. filter 0,4 kV-os elosztó",
+    "helyszin": "10. filter alatt, 3m",
+    "elosztoNev": "6CA",
+    "leagazasJel": "6CA 1/2",
+    "elosztoHelye": "VI. 0,4 kV-os főelosztó",
+    "berendezesKep": null,
+    "elosztoKep": null,
+    "feljegyzes": null
+  },
+  {
+    "kod": "6DW",
+    "megnevezes": "10. filter 0,4 kV-os elosztó",
+    "helyszin": "10. filter alatt, 3m",
+    "elosztoNev": "6CB",
+    "leagazasJel": "6CB 1/2",
+    "elosztoHelye": "VI. 0,4 kV-os főelosztó",
+    "berendezesKep": null,
+    "elosztoKep": null,
+    "feljegyzes": null
+  }
+]
