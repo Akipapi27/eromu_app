@@ -8,7 +8,8 @@
     "elosztoHelye": "Kazánház, 0 szint, BC köz, átjáró",
     "berendezesKep": null,
     "elosztoKep": null,
-    "feljegyzes": null
+    "feljegyzes": null,
+    "verzio": 0
   },
   {
     "kod": "2NG01D501-G01",
@@ -19,7 +20,8 @@
     "elosztoHelye": "Kazánház, 0 szint, BC köz, átjáró",
     "berendezesKep": null,
     "elosztoKep": null,
-    "feljegyzes": null
+    "feljegyzes": null,
+    "verzio": 0
   },
   {
     "kod": "2NG01D501-M01",
@@ -30,7 +32,8 @@
     "elosztoHelye": "Kazánház, 0 szint, BC köz, átjáró",
     "berendezesKep": null,
     "elosztoKep": null,
-    "feljegyzes": null
+    "feljegyzes": null,
+    "verzio": 0
   },
   {
     "kod": "2CT03",
@@ -41,7 +44,8 @@
     "elosztoHelye": "Kazánház, 0 szint, AB köz, K-i fal",
     "berendezesKep": null,
     "elosztoKep": null,
-    "feljegyzes": null
+    "feljegyzes": null,
+    "verzio": 0
   },
   {
     "kod": "6ND02D005",
@@ -52,7 +56,8 @@
     "elosztoHelye": "Kazánház, 7,5 m, DNY-i sarokban",
     "berendezesKep": null,
     "elosztoKep": null,
-    "feljegyzes": null
+    "feljegyzes": null,
+    "verzio": 0
   },
   {
     "kod": "6ND01D005",
@@ -63,7 +68,8 @@
     "elosztoHelye": "Kazánház, 7,5 m, DNY-i sarokban",
     "berendezesKep": null,
     "elosztoKep": null,
-    "feljegyzes": null
+    "feljegyzes": null,
+    "verzio": 0
   },
   {
     "kod": "6NC04S201",
@@ -74,7 +80,8 @@
     "elosztoHelye": "Kazánház, 7,5 m, D-i fal",
     "berendezesKep": null,
     "elosztoKep": null,
-    "feljegyzes": null
+    "feljegyzes": null,
+    "verzio": 0
   },
   {
     "kod": "6DQ",
@@ -85,7 +92,8 @@
     "elosztoHelye": "VI. 0,4 kV-os főelosztó",
     "berendezesKep": null,
     "elosztoKep": null,
-    "feljegyzes": null
+    "feljegyzes": null,
+    "verzio": 0
   },
   {
     "kod": "6DW",
@@ -96,6 +104,19 @@
     "elosztoHelye": "VI. 0,4 kV-os főelosztó",
     "berendezesKep": null,
     "elosztoKep": null,
-    "feljegyzes": null
+    "feljegyzes": null,
+    "verzio": 0
+  },
+  {
+    "kod": "6SC01D002",
+    "megnevezes": "Egyenáramú csapágyolaj szivattyú",
+    "helyszin": "VI. turbina alatt",
+    "elosztoNev": "6EA",
+    "leagazasJel": "6EA3",
+    "elosztoHelye": "VI. 0,4 kV-os főelosztó",
+    "berendezesKep": null,
+    "elosztoKep": null,
+    "feljegyzes": null,
+    "verzio": 20260703
   }
 ]
