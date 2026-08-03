@@ -96,7 +96,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
   String _hibaUzenet = '';
   String _utolsoFrissites = 'Betöltés...';
 
-  // Képállapotok
   bool _vanBerendezesKep = false;
   bool _vanElosztoKep = false;
   bool _vanLeagazasKep = false;
@@ -106,6 +105,9 @@ class _KeresoPanelState extends State<KeresoPanel> {
   bool _leagazasKepToltodik = false;
 
   static final Map<String, List<String>> _kepCache = {};
+
+  static const String _githubAssetsBase =
+      'https://raw.githubusercontent.com/Akipapi27/eromu_app/main/assets/';
 
   @override
   void initState() {
@@ -156,7 +158,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
   Future<void> _adatbazisBetoltese() async {
     try {
-      // Az adatbázis JSON is a GitHubról vagy a szerverről jön
       final alapUrl = Uri.base
           .resolve('assets/eromu_adatbazis.json')
           .toString();
@@ -355,42 +356,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     });
   }
 
-  // Megvizsgálja, hogy létezik-e a kép a GitHub-on HTTP HEAD kéréssel
-  Future<bool> _kepLetezikE(String url) async {
-    try {
-      final res = await http.head(Uri.parse(url));
-      if (res.statusCode == 200) return true;
-
-      final resGet = await http.get(Uri.parse(url));
-      if (resGet.statusCode == 200 && resGet.bodyBytes.length > 50) return true;
-    } catch (_) {}
-    return false;
-  }
-
-  Future<String?> _keresElerhetoKepet(
-    String alapMappaUrl,
-    String fajlNev,
-  ) async {
-    List<String> verziok = [
-      '$alapMappaUrl${fajlNev.toUpperCase()}.jpg',
-      '$alapMappaUrl${fajlNev.toUpperCase()}.webp',
-      '$alapMappaUrl${fajlNev.toUpperCase()}.png',
-      '$alapMappaUrl$fajlNev.jpg',
-      '$alapMappaUrl$fajlNev.webp',
-      '$alapMappaUrl$fajlNev.png',
-      '$alapMappaUrl${fajlNev.toLowerCase()}.jpg',
-      '$alapMappaUrl${fajlNev.toLowerCase()}.webp',
-      '$alapMappaUrl${fajlNev.toLowerCase()}.png',
-    ];
-
-    for (var u in verziok) {
-      if (await _kepLetezikE(u)) {
-        return u;
-      }
-    }
-    return null;
-  }
-
   Future<List<String>> _elerhetoKepekKeresese(String alapNev) async {
     if (alapNev.isEmpty) return [];
     if (_kepCache.containsKey(alapNev)) {
@@ -400,28 +365,25 @@ class _KeresoPanelState extends State<KeresoPanel> {
     List<String> talalatok = [];
     final buster = _getCacheBuster();
 
-    // KÖZVETLENÜL A GITHUB REPÓD NYERS (RAW) MAPPÁJA A KÉPEKHEZ:
-    const alapMappaUrl =
-        'https://raw.githubusercontent.com/Akipapi27/eromu_app/main/assets/';
+    List<String> imageFiles = [
+      '${alapNev.toUpperCase()}.jpg',
+      '${alapNev.toUpperCase()}.webp',
+      '${alapNev.toUpperCase()}.png',
+      '$alapNev.jpg',
+      '$alapNev.webp',
+      '$alapNev.png',
+      '${alapNev.toLowerCase()}.jpg',
+      '${alapNev.toLowerCase()}.webp',
+      '${alapNev.toLowerCase()}.png',
+    ];
 
-    final elsoTalalatUrl = await _keresElerhetoKepet(alapMappaUrl, alapNev);
-    if (elsoTalalatUrl != null) {
-      talalatok.add('$elsoTalalatUrl?v=$buster');
+    for (var file in imageFiles) {
+      talalatok.add('$_githubAssetsBase$file?v=$buster');
+      break;
     }
 
-    for (int i = 1; i <= 9; i++) {
-      final sorszamosUrl = await _keresElerhetoKepet(
-        alapMappaUrl,
-        '$alapNev-$i',
-      );
-      if (sorszamosUrl != null) {
-        final teljesUrl = '$sorszamosUrl?v=$buster';
-        if (!talalatok.contains(teljesUrl)) {
-          talalatok.add(teljesUrl);
-        }
-      } else {
-        break;
-      }
+    for (int i = 1; i <= 5; i++) {
+      talalatok.add('$_githubAssetsBase$alapNev-$i.jpg?v=$buster');
     }
 
     _kepCache[alapNev] = talalatok;
@@ -429,15 +391,8 @@ class _KeresoPanelState extends State<KeresoPanel> {
   }
 
   void _galeriaInditasa(String alapNev, String cim) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
-
     final letoltottUrlLista = await _elerhetoKepekKeresese(alapNev);
     if (!mounted) return;
-    Navigator.pop(context);
 
     if (letoltottUrlLista.isEmpty) {
       _nincsKepUzenet(context);
@@ -540,11 +495,18 @@ class _KeresoPanelState extends State<KeresoPanel> {
                               child: Image.network(
                                 kepurlEk[aktualisIndex],
                                 fit: BoxFit.contain,
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    },
                                 errorBuilder: (context, error, stackTrace) =>
                                     const Center(
                                       child: Text(
-                                        'Nem sikerült betölteni a képet a GitHubról',
-                                        style: TextStyle(color: Colors.white),
+                                        'Nincs még ilyen sorszámú kép feltöltve',
+                                        style: TextStyle(color: Colors.orange),
                                       ),
                                     ),
                               ),
