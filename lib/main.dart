@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'dart:async';
-import 'dart:ui_web' as ui;
-import 'package:universal_html/html.dart' as html;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -107,6 +105,8 @@ class _KeresoPanelState extends State<KeresoPanel> {
   bool _elosztoKepToltodik = false;
   bool _leagazasKepToltodik = false;
 
+  static final Map<String, List<String>> _kepCache = {};
+
   @override
   void initState() {
     super.initState();
@@ -156,6 +156,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
   Future<void> _adatbazisBetoltese() async {
     try {
+      // Az adatbázis JSON is a GitHubról vagy a szerverről jön
       final alapUrl = Uri.base
           .resolve('assets/eromu_adatbazis.json')
           .toString();
@@ -312,7 +313,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     });
   }
 
-  // OPTIMALIZÁLT: Párhuzamos szálakon futtatott kép-ellenőrzés
   void _pahrhuzamosKepStatuszEllenorzes(BerendezesAdat item) {
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
@@ -355,37 +355,24 @@ class _KeresoPanelState extends State<KeresoPanel> {
     });
   }
 
+  // Megvizsgálja, hogy létezik-e a kép a GitHub-on HTTP HEAD kéréssel
   Future<bool> _kepLetezikE(String url) async {
-    final completer = Completer<bool>();
-    final img = html.ImageElement();
+    try {
+      final res = await http.head(Uri.parse(url));
+      if (res.statusCode == 200) return true;
 
-    img.onLoad.listen((_) {
-      if (!completer.isCompleted) completer.complete(true);
-    });
-
-    img.onError.listen((_) {
-      if (!completer.isCompleted) completer.complete(false);
-    });
-
-    img.src = '$url?v=${_getCacheBuster()}';
-
-    return completer.future.timeout(
-      const Duration(milliseconds: 1500),
-      onTimeout: () => false,
-    );
+      final resGet = await http.get(Uri.parse(url));
+      if (resGet.statusCode == 200 && resGet.bodyBytes.length > 50) return true;
+    } catch (_) {}
+    return false;
   }
 
-  // OPTIMALIZÁLT: Először a legvalószínűbb NAGYBETŰS .jpg-t teszteli, ha megvan, azonnal visszatér!
   Future<String?> _keresElerhetoKepet(
     String alapMappaUrl,
     String fajlNev,
   ) async {
-    final elsoProba = '$alapMappaUrl${fajlNev.toUpperCase()}.jpg';
-    if (await _kepLetezikE(elsoProba)) {
-      return elsoProba;
-    }
-
-    List<String> tovabbiVerziok = [
+    List<String> verziok = [
+      '$alapMappaUrl${fajlNev.toUpperCase()}.jpg',
       '$alapMappaUrl${fajlNev.toUpperCase()}.webp',
       '$alapMappaUrl${fajlNev.toUpperCase()}.png',
       '$alapMappaUrl$fajlNev.jpg',
@@ -396,12 +383,9 @@ class _KeresoPanelState extends State<KeresoPanel> {
       '$alapMappaUrl${fajlNev.toLowerCase()}.png',
     ];
 
-    final ellenorzesek = tovabbiVerziok.map((u) => _kepLetezikE(u)).toList();
-    final eredmenyek = await Future.wait(ellenorzesek);
-
-    for (int i = 0; i < eredmenyek.length; i++) {
-      if (eredmenyek[i]) {
-        return tovabbiVerziok[i];
+    for (var u in verziok) {
+      if (await _kepLetezikE(u)) {
+        return u;
       }
     }
     return null;
@@ -409,31 +393,38 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
   Future<List<String>> _elerhetoKepekKeresese(String alapNev) async {
     if (alapNev.isEmpty) return [];
+    if (_kepCache.containsKey(alapNev)) {
+      return _kepCache[alapNev]!;
+    }
+
     List<String> talalatok = [];
     final buster = _getCacheBuster();
 
-    final alapMappaUrl = Uri.base.resolve('assets/').toString();
+    // KÖZVETLENÜL A GITHUB REPÓD NYERS (RAW) MAPPÁJA A KÉPEKHEZ:
+    const alapMappaUrl =
+        'https://raw.githubusercontent.com/Akipapi27/eromu_app/main/assets/';
 
     final elsoTalalatUrl = await _keresElerhetoKepet(alapMappaUrl, alapNev);
     if (elsoTalalatUrl != null) {
       talalatok.add('$elsoTalalatUrl?v=$buster');
     }
 
-    final sorszamosKeresesek = List.generate(
-      9,
-      (i) => _keresElerhetoKepet(alapMappaUrl, '$alapNev-${i + 1}'),
-    );
-    final sorszamosTalalatok = await Future.wait(sorszamosKeresesek);
-
-    for (var talalatUrl in sorszamosTalalatok) {
-      if (talalatUrl != null) {
-        final teljesUrl = '$talalatUrl?v=$buster';
+    for (int i = 1; i <= 9; i++) {
+      final sorszamosUrl = await _keresElerhetoKepet(
+        alapMappaUrl,
+        '$alapNev-$i',
+      );
+      if (sorszamosUrl != null) {
+        final teljesUrl = '$sorszamosUrl?v=$buster';
         if (!talalatok.contains(teljesUrl)) {
           talalatok.add(teljesUrl);
         }
+      } else {
+        break;
       }
     }
 
+    _kepCache[alapNev] = talalatok;
     return talalatok;
   }
 
@@ -463,19 +454,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
   ) {
     int aktualisIndex = 0;
     final TransformationController transformCtrl = TransformationController();
-
-    void regisztralKepatmero(String url, int index) {
-      ui.platformViewRegistry.registerViewFactory(
-        'html-image-$egyediAzonosito-$index',
-        (int viewId) => html.ImageElement()
-          ..src = url
-          ..style.objectFit = 'contain'
-          ..style.width = '100%'
-          ..style.height = '100%',
-      );
-    }
-
-    regisztralKepatmero(kepurlEk[aktualisIndex], aktualisIndex);
 
     showGeneralDialog(
       context: context,
@@ -559,12 +537,16 @@ class _KeresoPanelState extends State<KeresoPanel> {
                               clipBehavior: Clip.none,
                               minScale: 1.0,
                               maxScale: 10.0,
-                              child: HtmlElementView(
-                                key: ValueKey(
-                                  'view-$egyediAzonosito-$aktualisIndex',
-                                ),
-                                viewType:
-                                    'html-image-$egyediAzonosito-$aktualisIndex',
+                              child: Image.network(
+                                kepurlEk[aktualisIndex],
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Center(
+                                      child: Text(
+                                        'Nem sikerült betölteni a képet a GitHubról',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
                               ),
                             ),
                           ),
@@ -589,10 +571,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                         aktualisIndex--;
                                         transformCtrl.value =
                                             Matrix4.identity();
-                                        regisztralKepatmero(
-                                          kepurlEk[aktualisIndex],
-                                          aktualisIndex,
-                                        );
                                       });
                                     }
                                   : null,
@@ -610,10 +588,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                         aktualisIndex++;
                                         transformCtrl.value =
                                             Matrix4.identity();
-                                        regisztralKepatmero(
-                                          kepurlEk[aktualisIndex],
-                                          aktualisIndex,
-                                        );
                                       });
                                     }
                                   : null,
