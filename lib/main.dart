@@ -312,55 +312,34 @@ class _KeresoPanelState extends State<KeresoPanel> {
     });
   }
 
+  // OPTIMALIZÁLT: Párhuzamos szálakon futtatott kép-ellenőrzés
   void _pahrhuzamosKepStatuszEllenorzes(BerendezesAdat item) {
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
     final leagazasTiszta = item.leagazasJel.trim();
 
-    _elerhetoKepekKeresese(kodTiszta).then((kepek) {
+    final fKod = _elerhetoKepekKeresese(kodTiszta);
+    final fEloszto = elosztoTiszta.isNotEmpty
+        ? _elerhetoKepekKeresese(elosztoTiszta)
+        : Future.value(<String>[]);
+    final fLeagazas = leagazasTiszta.isNotEmpty
+        ? _elerhetoKepekKeresese(leagazasTiszta)
+        : Future.value(<String>[]);
+
+    Future.wait([fKod, fEloszto, fLeagazas]).then((results) {
       if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
         setState(() {
-          _vanBerendezesKep = kepek.isNotEmpty;
+          _vanBerendezesKep = results[0].isNotEmpty;
           _berendezesKepToltodik = false;
-        });
-      }
-    });
 
-    if (elosztoTiszta.isNotEmpty) {
-      _elerhetoKepekKeresese(elosztoTiszta).then((kepek) {
-        if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
-          setState(() {
-            _vanElosztoKep = kepek.isNotEmpty;
-            _elosztoKepToltodik = false;
-          });
-        }
-      });
-    } else {
-      if (mounted) {
-        setState(() {
-          _vanElosztoKep = false;
+          _vanElosztoKep = results[1].isNotEmpty;
           _elosztoKepToltodik = false;
-        });
-      }
-    }
 
-    if (leagazasTiszta.isNotEmpty) {
-      _elerhetoKepekKeresese(leagazasTiszta).then((kepek) {
-        if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
-          setState(() {
-            _vanLeagazasKep = kepek.isNotEmpty;
-            _leagazasKepToltodik = false;
-          });
-        }
-      });
-    } else {
-      if (mounted) {
-        setState(() {
-          _vanLeagazasKep = false;
+          _vanLeagazasKep = results[2].isNotEmpty;
           _leagazasKepToltodik = false;
         });
       }
-    }
+    });
   }
 
   void _visszaAKeresohoz() {
@@ -391,18 +370,22 @@ class _KeresoPanelState extends State<KeresoPanel> {
     img.src = '$url?v=${_getCacheBuster()}';
 
     return completer.future.timeout(
-      const Duration(seconds: 2),
+      const Duration(milliseconds: 1500),
       onTimeout: () => false,
     );
   }
 
+  // OPTIMALIZÁLT: Először a legvalószínűbb NAGYBETŰS .jpg-t teszteli, ha megvan, azonnal visszatér!
   Future<String?> _keresElerhetoKepet(
     String alapMappaUrl,
     String fajlNev,
   ) async {
-    // Elsőként a NAGYBETŰS formátumot próbáljuk (pl. 6CA.jpg)
-    List<String> verziok = [
-      '$alapMappaUrl${fajlNev.toUpperCase()}.jpg',
+    final elsoProba = '$alapMappaUrl${fajlNev.toUpperCase()}.jpg';
+    if (await _kepLetezikE(elsoProba)) {
+      return elsoProba;
+    }
+
+    List<String> tovabbiVerziok = [
       '$alapMappaUrl${fajlNev.toUpperCase()}.webp',
       '$alapMappaUrl${fajlNev.toUpperCase()}.png',
       '$alapMappaUrl$fajlNev.jpg',
@@ -413,12 +396,12 @@ class _KeresoPanelState extends State<KeresoPanel> {
       '$alapMappaUrl${fajlNev.toLowerCase()}.png',
     ];
 
-    final ellenorzesek = verziok.map((u) => _kepLetezikE(u)).toList();
+    final ellenorzesek = tovabbiVerziok.map((u) => _kepLetezikE(u)).toList();
     final eredmenyek = await Future.wait(ellenorzesek);
 
     for (int i = 0; i < eredmenyek.length; i++) {
       if (eredmenyek[i]) {
-        return verziok[i];
+        return tovabbiVerziok[i];
       }
     }
     return null;
@@ -429,8 +412,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
     List<String> talalatok = [];
     final buster = _getCacheBuster();
 
-    const alapMappaUrl =
-        'https://raw.githubusercontent.com/Akipapi27/eromu_app/main/assets/';
+    final alapMappaUrl = Uri.base.resolve('assets/').toString();
 
     final elsoTalalatUrl = await _keresElerhetoKepet(alapMappaUrl, alapNev);
     if (elsoTalalatUrl != null) {
