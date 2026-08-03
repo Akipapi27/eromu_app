@@ -87,7 +87,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
   BerendezesAdat? _kivalasztottBerendezes;
   String? _kivalasztottElosztoNev;
-  String? _visszaElosztoNev; // Megjegyzi, ha elosztóból léptünk a berendezésre
+  String? _visszaElosztoNev;
 
   NezetTipus _aktualisNezet = NezetTipus.kereso;
 
@@ -400,16 +400,17 @@ class _KeresoPanelState extends State<KeresoPanel> {
     String alapMappaUrl,
     String fajlNev,
   ) async {
+    // Elsőként a NAGYBETŰS formátumot próbáljuk (pl. 6CA.jpg)
     List<String> verziok = [
-      '$alapMappaUrl${fajlNev.toLowerCase()}.webp',
-      '$alapMappaUrl${fajlNev.toLowerCase()}.jpg',
-      '$alapMappaUrl${fajlNev.toLowerCase()}.png',
-      '$alapMappaUrl${fajlNev.toUpperCase()}.webp',
       '$alapMappaUrl${fajlNev.toUpperCase()}.jpg',
+      '$alapMappaUrl${fajlNev.toUpperCase()}.webp',
       '$alapMappaUrl${fajlNev.toUpperCase()}.png',
-      '$alapMappaUrl$fajlNev.webp',
       '$alapMappaUrl$fajlNev.jpg',
+      '$alapMappaUrl$fajlNev.webp',
       '$alapMappaUrl$fajlNev.png',
+      '$alapMappaUrl${fajlNev.toLowerCase()}.jpg',
+      '$alapMappaUrl${fajlNev.toLowerCase()}.webp',
+      '$alapMappaUrl${fajlNev.toLowerCase()}.png',
     ];
 
     final ellenorzesek = verziok.map((u) => _kepLetezikE(u)).toList();
@@ -428,7 +429,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     List<String> talalatok = [];
     final buster = _getCacheBuster();
 
-    // GitHub elérés a frissített repóddal
     const alapMappaUrl =
         'https://raw.githubusercontent.com/Akipapi27/eromu_app/main/assets/';
 
