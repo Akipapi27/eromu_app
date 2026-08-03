@@ -83,7 +83,7 @@ class KeresoPanel extends StatefulWidget {
 class _KeresoPanelState extends State<KeresoPanel> {
   // A képek GitHub RAW elérése
   static const String _gitHubBaseUrl =
-      'https://raw.githubusercontent.com/Gorfolakos/eromu_app/main/assets/assets/';
+      'https://raw.githubusercontent.com/Akipapi27/eromu_app/main/assets/assets/';
 
   List<BerendezesAdat> _mindenAdat = [];
   List<BerendezesAdat> _szurtBerendezesLista = [];
