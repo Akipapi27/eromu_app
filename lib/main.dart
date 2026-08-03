@@ -365,25 +365,33 @@ class _KeresoPanelState extends State<KeresoPanel> {
     List<String> talalatok = [];
     final buster = _getCacheBuster();
 
-    List<String> imageFiles = [
-      '${alapNev.toUpperCase()}.jpg',
-      '${alapNev.toUpperCase()}.webp',
-      '${alapNev.toUpperCase()}.png',
-      '$alapNev.jpg',
-      '$alapNev.webp',
-      '$alapNev.png',
-      '${alapNev.toLowerCase()}.jpg',
-      '${alapNev.toLowerCase()}.webp',
-      '${alapNev.toLowerCase()}.png',
+    // Az összes lehetséges kiterjesztés és névváltozat beletöltése a listába
+    List<String> extensions = [
+      'jpg',
+      'JPG',
+      'jpeg',
+      'JPEG',
+      'png',
+      'PNG',
+      'webp',
+    ];
+    List<String> names = [
+      alapNev,
+      alapNev.toUpperCase(),
+      alapNev.toLowerCase(),
     ];
 
-    for (var file in imageFiles) {
-      talalatok.add('$_githubAssetsBase$file?v=$buster');
-      break;
+    for (var name in names) {
+      for (var ext in extensions) {
+        talalatok.add('$_githubAssetsBase$name.$ext?v=$buster');
+      }
     }
 
+    // Sorszámozott képek (-1, -2 stb.)
     for (int i = 1; i <= 5; i++) {
-      talalatok.add('$_githubAssetsBase$alapNev-$i.jpg?v=$buster');
+      for (var ext in extensions) {
+        talalatok.add('$_githubAssetsBase$alapNev-$i.$ext?v=$buster');
+      }
     }
 
     _kepCache[alapNev] = talalatok;
@@ -475,11 +483,19 @@ class _KeresoPanelState extends State<KeresoPanel> {
                         ],
                       ),
                     ),
-                    const Text(
-                      'Két ujjal / egérrel extra nagyra (10x) nagyítható',
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        'Keresett URL: ${kepurlEk[aktualisIndex]}',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.yellowAccent,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 5),
                     Expanded(
                       child: Center(
                         child: Container(
@@ -503,10 +519,17 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                       );
                                     },
                                 errorBuilder: (context, error, stackTrace) =>
-                                    const Center(
-                                      child: Text(
-                                        'Nincs még ilyen sorszámú kép feltöltve',
-                                        style: TextStyle(color: Colors.orange),
+                                    Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Text(
+                                          'Hiba a kép betöltésekor:\n${kepurlEk[aktualisIndex]}\n\nHiba: $error',
+                                          style: const TextStyle(
+                                            color: Colors.redAccent,
+                                            fontSize: 12,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
                                     ),
                               ),
@@ -516,53 +539,50 @@ class _KeresoPanelState extends State<KeresoPanel> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    if (kepurlEk.length > 1)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          bottom: 20.0,
-                          left: 30,
-                          right: 30,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ElevatedButton.icon(
-                              onPressed: aktualisIndex > 0
-                                  ? () {
-                                      setModalState(() {
-                                        aktualisIndex--;
-                                        transformCtrl.value =
-                                            Matrix4.identity();
-                                      });
-                                    }
-                                  : null,
-                              icon: const Icon(Icons.arrow_back, size: 16),
-                              label: const Text('Vissza'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white24,
-                                foregroundColor: Colors.white,
-                              ),
-                            ),
-                            ElevatedButton.icon(
-                              onPressed: aktualisIndex < kepurlEk.length - 1
-                                  ? () {
-                                      setModalState(() {
-                                        aktualisIndex++;
-                                        transformCtrl.value =
-                                            Matrix4.identity();
-                                      });
-                                    }
-                                  : null,
-                              icon: const Icon(Icons.arrow_forward, size: 16),
-                              label: const Text('Előre'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white24,
-                                foregroundColor: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        bottom: 20.0,
+                        left: 30,
+                        right: 30,
                       ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: aktualisIndex > 0
+                                ? () {
+                                    setModalState(() {
+                                      aktualisIndex--;
+                                      transformCtrl.value = Matrix4.identity();
+                                    });
+                                  }
+                                : null,
+                            icon: const Icon(Icons.arrow_back, size: 16),
+                            label: const Text('Előző variáció'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white24,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: aktualisIndex < kepurlEk.length - 1
+                                ? () {
+                                    setModalState(() {
+                                      aktualisIndex++;
+                                      transformCtrl.value = Matrix4.identity();
+                                    });
+                                  }
+                                : null,
+                            icon: const Icon(Icons.arrow_forward, size: 16),
+                            label: const Text('Következő variáció'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white24,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -998,48 +1018,28 @@ class _KeresoPanelState extends State<KeresoPanel> {
                     Tooltip(
                       message: _berendezesKepToltodik
                           ? 'Képkeresés...'
-                          : (_vanBerendezesKep
-                                ? 'Berendezés fotójának megtekintése'
-                                : 'Nincs még kép feltöltve'),
+                          : 'Berendezés fotójának megtekintése',
                       child: ElevatedButton.icon(
-                        onPressed: _berendezesKepToltodik
-                            ? null
-                            : (_vanBerendezesKep
-                                  ? () => _galeriaInditasa(
-                                      kodTiszta,
-                                      'Berendezés: ${item.megnevezes}',
-                                    )
-                                  : () => _nincsKepUzenet(context)),
-                        icon: _berendezesKepToltodik
-                            ? const SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Icon(
-                                Icons.camera_alt,
-                                size: 18,
-                                color: _vanBerendezesKep
-                                    ? Colors.blue[900]
-                                    : Colors.grey[600],
-                              ),
+                        onPressed: () => _galeriaInditasa(
+                          kodTiszta,
+                          'Berendezés: ${item.megnevezes}',
+                        ),
+                        icon: Icon(
+                          Icons.camera_alt,
+                          size: 18,
+                          color: Colors.blue[900],
+                        ),
                         label: Text(
                           'Berendezés fotó',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: _vanBerendezesKep
-                                ? Colors.blue[900]
-                                : Colors.grey[600],
+                            color: Colors.blue[900],
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _vanBerendezesKep
-                              ? Colors.blue[50]
-                              : Colors.grey[200],
-                          elevation: _vanBerendezesKep ? 2 : 0,
+                          backgroundColor: Colors.blue[50],
+                          elevation: 2,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 14,
                             vertical: 10,
@@ -1092,20 +1092,12 @@ class _KeresoPanelState extends State<KeresoPanel> {
                               const SizedBox(width: 8),
                               if (item.leagazasJel.isNotEmpty)
                                 Tooltip(
-                                  message: _leagazasKepToltodik
-                                      ? 'Képkeresés...'
-                                      : (_vanLeagazasKep
-                                            ? 'Leágazás fotójának megtekintése'
-                                            : 'Nincs még kép feltöltve'),
+                                  message: 'Leágazás fotójának megtekintése',
                                   child: InkWell(
-                                    onTap: _leagazasKepToltodik
-                                        ? null
-                                        : (_vanLeagazasKep
-                                              ? () => _galeriaInditasa(
-                                                  leagazasTiszta,
-                                                  'Leágazás: ${item.leagazasJel}',
-                                                )
-                                              : () => _nincsKepUzenet(context)),
+                                    onTap: () => _galeriaInditasa(
+                                      leagazasTiszta,
+                                      'Leágazás: ${item.leagazasJel}',
+                                    ),
                                     borderRadius: BorderRadius.circular(4),
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
@@ -1116,13 +1108,9 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                         '[Leágazás: ${item.leagazasJel}]',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: _vanLeagazasKep
-                                              ? Colors.blue[700]
-                                              : Colors.grey[600],
+                                          color: Colors.blue[700],
                                           fontSize: 14,
-                                          decoration: _vanLeagazasKep
-                                              ? TextDecoration.underline
-                                              : TextDecoration.none,
+                                          decoration: TextDecoration.underline,
                                         ),
                                       ),
                                     ),
@@ -1142,50 +1130,28 @@ class _KeresoPanelState extends State<KeresoPanel> {
                       ),
                     ),
                     Tooltip(
-                      message: _elosztoKepToltodik
-                          ? 'Képkeresés...'
-                          : (_vanElosztoKep
-                                ? 'Elosztó fotójának megtekintése'
-                                : 'Nincs még kép feltöltve'),
+                      message: 'Elosztó fotójának megtekintése',
                       child: ElevatedButton.icon(
-                        onPressed: _elosztoKepToltodik
-                            ? null
-                            : (_vanElosztoKep
-                                  ? () => _galeriaInditasa(
-                                      elosztoTiszta,
-                                      'Elosztó: ${item.elosztoNev}',
-                                    )
-                                  : () => _nincsKepUzenet(context)),
-                        icon: _elosztoKepToltodik
-                            ? const SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Icon(
-                                Icons.bolt,
-                                size: 18,
-                                color: _vanElosztoKep
-                                    ? Colors.amber[900]
-                                    : Colors.grey[600],
-                              ),
+                        onPressed: () => _galeriaInditasa(
+                          elosztoTiszta,
+                          'Elosztó: ${item.elosztoNev}',
+                        ),
+                        icon: Icon(
+                          Icons.bolt,
+                          size: 18,
+                          color: Colors.amber[900],
+                        ),
                         label: Text(
                           'Elosztó fotó',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: _vanElosztoKep
-                                ? Colors.amber[900]
-                                : Colors.grey[600],
+                            color: Colors.amber[900],
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _vanElosztoKep
-                              ? Colors.amber[50]
-                              : Colors.grey[200],
-                          elevation: _vanElosztoKep ? 2 : 0,
+                          backgroundColor: Colors.amber[50],
+                          elevation: 2,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 14,
                             vertical: 10,
@@ -1284,50 +1250,28 @@ class _KeresoPanelState extends State<KeresoPanel> {
                       ],
                     ),
                     Tooltip(
-                      message: _elosztoKepToltodik
-                          ? 'Képkeresés...'
-                          : (_vanElosztoKep
-                                ? 'Elosztó fotójának megtekintése'
-                                : 'Nincs még kép feltöltve'),
+                      message: 'Elosztó fotójának megtekintése',
                       child: ElevatedButton.icon(
-                        onPressed: _elosztoKepToltodik
-                            ? null
-                            : (_vanElosztoKep
-                                  ? () => _galeriaInditasa(
-                                      elosztoNev,
-                                      'Elosztó: $elosztoNev',
-                                    )
-                                  : () => _nincsKepUzenet(context)),
-                        icon: _elosztoKepToltodik
-                            ? const SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Icon(
-                                Icons.camera_alt,
-                                size: 18,
-                                color: _vanElosztoKep
-                                    ? Colors.amber[900]
-                                    : Colors.grey[600],
-                              ),
+                        onPressed: () => _galeriaInditasa(
+                          elosztoNev,
+                          'Elosztó: $elosztoNev',
+                        ),
+                        icon: Icon(
+                          Icons.camera_alt,
+                          size: 18,
+                          color: Colors.amber[900],
+                        ),
                         label: Text(
                           'Elosztó fotó',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: _vanElosztoKep
-                                ? Colors.amber[900]
-                                : Colors.grey[600],
+                            color: Colors.amber[900],
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _vanElosztoKep
-                              ? Colors.white
-                              : Colors.grey[200],
-                          elevation: _vanElosztoKep ? 2 : 0,
+                          backgroundColor: Colors.white,
+                          elevation: 2,
                         ),
                       ),
                     ),
