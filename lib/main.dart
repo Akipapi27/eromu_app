@@ -81,10 +81,6 @@ class KeresoPanel extends StatefulWidget {
 }
 
 class _KeresoPanelState extends State<KeresoPanel> {
-  // A képek GitHub RAW elérése
-  static const String _gitHubBaseUrl =
-      'https://raw.githubusercontent.com/Akipapi27/eromu_app/main/assets/assets/';
-
   List<BerendezesAdat> _mindenAdat = [];
   List<BerendezesAdat> _szurtBerendezesLista = [];
   List<String> _szurtElosztoLista = [];
@@ -380,7 +376,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     });
   }
 
-  // Megnézi, hogy létezik-e a kép az adott URL-en
   Future<bool> _kepLetezikE(String url) async {
     final completer = Completer<bool>();
     final img = html.ImageElement();
@@ -401,38 +396,59 @@ class _KeresoPanelState extends State<KeresoPanel> {
     );
   }
 
-  // Karaktertisztító segédfunkció (megegyezik a zsh script logikájával)
-  String _tisztitAzonosito(String azonosito) {
-    String tiszta = azonosito.trim().toLowerCase();
-    tiszta = tiszta.replaceAll('/', '_');
-    tiszta = tiszta.replaceAll(' ', '_');
-    tiszta = tiszta.replaceAll('__', '_');
-    return tiszta;
-  }
+  Future<String?> _keresElerhetoKepet(
+    String alapMappaUrl,
+    String fajlNev,
+  ) async {
+    List<String> verziok = [
+      '$alapMappaUrl${fajlNev.toLowerCase()}.webp',
+      '$alapMappaUrl${fajlNev.toLowerCase()}.jpg',
+      '$alapMappaUrl${fajlNev.toLowerCase()}.png',
+      '$alapMappaUrl${fajlNev.toUpperCase()}.webp',
+      '$alapMappaUrl${fajlNev.toUpperCase()}.jpg',
+      '$alapMappaUrl${fajlNev.toUpperCase()}.png',
+      '$alapMappaUrl$fajlNev.webp',
+      '$alapMappaUrl$fajlNev.jpg',
+      '$alapMappaUrl$fajlNev.png',
+    ];
 
-  // Megkeresi a fő képet (pl. 6ds_01.jpg) és a galéria képeket (6ds_01_1.jpg ... 6ds_01_9.jpg)
-  Future<List<String>> _elerhetoKepekKeresese(String alapNev) async {
-    if (alapNev.isEmpty) return [];
-
-    final buster = _getCacheBuster();
-    final tisztaAlap = _tisztitAzonosito(alapNev);
-
-    // 1. Összeállítjuk a lehetséges URL-eket (Fő kép + _1-től _9-ig terjedő galéria)
-    List<String> vizsgalandoUrlEk = ['$_gitHubBaseUrl$tisztaAlap.jpg'];
-
-    for (int i = 1; i <= 9; i++) {
-      vizsgalandoUrlEk.add('$_gitHubBaseUrl${tisztaAlap}-$i.jpg');
-    }
-
-    // 2. Párhuzamosan leteszteljük mind a 10 opciót
-    final ellenorzesek = vizsgalandoUrlEk.map((u) => _kepLetezikE(u)).toList();
+    final ellenorzesek = verziok.map((u) => _kepLetezikE(u)).toList();
     final eredmenyek = await Future.wait(ellenorzesek);
 
-    // 3. Csak a létező képeket adjuk vissza
-    List<String> talalatok = [];
     for (int i = 0; i < eredmenyek.length; i++) {
       if (eredmenyek[i]) {
-        talalatok.add('${vizsgalandoUrlEk[i]}?v=$buster');
+        return verziok[i];
+      }
+    }
+    return null;
+  }
+
+  Future<List<String>> _elerhetoKepekKeresese(String alapNev) async {
+    if (alapNev.isEmpty) return [];
+    List<String> talalatok = [];
+    final buster = _getCacheBuster();
+
+    // GitHub elérés a frissített repóddal
+    const alapMappaUrl =
+        'https://raw.githubusercontent.com/Akipapi27/eromu_app/main/assets/';
+
+    final elsoTalalatUrl = await _keresElerhetoKepet(alapMappaUrl, alapNev);
+    if (elsoTalalatUrl != null) {
+      talalatok.add('$elsoTalalatUrl?v=$buster');
+    }
+
+    final sorszamosKeresesek = List.generate(
+      9,
+      (i) => _keresElerhetoKepet(alapMappaUrl, '$alapNev-${i + 1}'),
+    );
+    final sorszamosTalalatok = await Future.wait(sorszamosKeresesek);
+
+    for (var talalatUrl in sorszamosTalalatok) {
+      if (talalatUrl != null) {
+        final teljesUrl = '$talalatUrl?v=$buster';
+        if (!talalatok.contains(teljesUrl)) {
+          talalatok.add(teljesUrl);
+        }
       }
     }
 
