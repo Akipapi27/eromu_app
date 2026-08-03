@@ -96,6 +96,9 @@ class _KeresoPanelState extends State<KeresoPanel> {
   String _hibaUzenet = '';
   String _utolsoFrissites = 'Betöltés...';
 
+  static const String _githubAssetsBase =
+      'https://raw.githubusercontent.com/Akipapi27/eromu_app/main/assets/';
+
   @override
   void initState() {
     super.initState();
@@ -293,53 +296,49 @@ class _KeresoPanelState extends State<KeresoPanel> {
     });
   }
 
-  // Eredeti, jól működő asset/helyi képfeltérképezés
-  Future<List<String>> _elerhetoKepekKeresese(String alapNev) async {
+  // Összeállítja a lehetséges GitHub URL-ek listáját (alap + kis/nagybetűk + kiterjesztések + sorszámok)
+  List<String> _osszesKigyujtottKepUrl(String alapNev) {
     if (alapNev.isEmpty) return [];
-    List<String> talalatok = [];
     final buster = _getCacheBuster();
-    final alapMappaUrl = Uri.base.resolve('assets/').toString();
+    List<String> urlk = [];
 
-    List<String> kiterjesztesek = [
+    List<String> extensions = [
       'jpg',
       'JPG',
+      'jpeg',
+      'JPEG',
       'png',
       'PNG',
       'webp',
-      'jpeg',
-      'JPEG',
     ];
-    List<String> nevek = [
+    List<String> names = [
       alapNev,
       alapNev.toUpperCase(),
       alapNev.toLowerCase(),
     ];
 
-    for (var nev in nevek) {
-      for (var kit in kiterjesztesek) {
-        talalatok.add('$alapMappaUrl$nev.$kit?v=$buster');
+    for (var name in names) {
+      for (var ext in extensions) {
+        urlk.add('$_githubAssetsBase$name.$ext?v=$buster');
       }
     }
 
     for (int i = 1; i <= 5; i++) {
-      for (var kit in kiterjesztesek) {
-        talalatok.add('$alapMappaUrl$alapNev-$i.$kit?v=$buster');
+      for (var ext in extensions) {
+        urlk.add('$_githubAssetsBase$alapNev-$i.$ext?v=$buster');
       }
     }
 
-    return talalatok;
+    return urlk;
   }
 
-  void _galeriaInditasa(String alapNev, String cim) async {
-    final letoltottUrlLista = await _elerhetoKepekKeresese(alapNev);
-    if (!mounted) return;
-
-    if (letoltottUrlLista.isEmpty) {
+  void _galeriaInditasa(String alapNev, String cim) {
+    final urlLista = _osszesKigyujtottKepUrl(alapNev);
+    if (urlLista.isEmpty) {
       _nincsKepUzenet(context);
       return;
     }
-
-    _galeriaMegnyitasa(letoltottUrlLista, cim, alapNev);
+    _galeriaMegnyitasa(urlLista, cim, alapNev);
   }
 
   void _galeriaMegnyitasa(
