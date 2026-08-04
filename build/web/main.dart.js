@@ -42291,7 +42291,7 @@ for(;;)switch(s){case 0:if(a.length===0){q=A.c([],t.s)
 s=1
 break}o=A.c([],t.s)
 n=B.i.k(Date.now())
-m=A.azF().a3("assets/").k(0)
+m=A.azF().a3("assets/assets/").k(0)
 s=3
 return A.W(p.rM(m,a),$async$kD)
 case 3:l=c
