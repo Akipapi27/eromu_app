@@ -111,41 +111,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }
 
-  DateTime? _parseHttpDate(String dateStr) {
-    try {
-      return DateTime.parse(dateStr);
-    } catch (_) {
-      try {
-        final parts = dateStr.split(' ');
-        if (parts.length >= 5) {
-          final nap = parts[1];
-          final honapNev = parts[2].toLowerCase();
-          final ev = parts[3];
-          final ido = parts[4];
-
-          final honapok = {
-            'jan': '01',
-            'feb': '02',
-            'mar': '03',
-            'apr': '04',
-            'may': '05',
-            'jun': '06',
-            'jul': '07',
-            'aug': '08',
-            'sep': '09',
-            'oct': '10',
-            'nov': '11',
-            'dec': '12',
-          };
-          final honap = honapok[honapNev.substring(0, 3)] ?? '01';
-
-          return DateTime.parse('$ev-$honap-${nap.padLeft(2, '0')}T${ido}Z');
-        }
-      } catch (_) {}
-    }
-    return null;
-  }
-
   Future<void> _adatbazisBetoltese() async {
     try {
       final alapUrl = Uri.base
@@ -157,22 +122,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
       if (response.statusCode != 200) {
         throw Exception('Szerver hiba: ${response.statusCode}');
-      }
-
-      if (response.headers['last-modified'] != null) {
-        final parsedDate = _parseHttpDate(response.headers['last-modified']!);
-        if (parsedDate != null) {
-          final helyiIdo = parsedDate.toLocal();
-          _utolsoFrissites =
-              '${helyiIdo.year}. '
-              '${helyiIdo.month.toString().padLeft(2, '0')}. '
-              '${helyiIdo.day.toString().padLeft(2, '0')}. '
-              '${helyiIdo.hour.toString().padLeft(2, '0')}:${helyiIdo.minute.toString().padLeft(2, '0')}';
-        } else {
-          _utolsoFrissites = 'Ismeretlen dátumformátum';
-        }
-      } else {
-        _utolsoFrissites = 'Nem meghatározható';
       }
 
       final List<dynamic> jsonLista = jsonDecode(
@@ -296,7 +245,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     });
   }
 
-  // Összeállítja a lehetséges GitHub URL-ek listáját (alap + kis/nagybetűk + kiterjesztések + sorszámok)
   List<String> _osszesKigyujtottKepUrl(String alapNev) {
     if (alapNev.isEmpty) return [];
     final buster = _getCacheBuster();
@@ -630,30 +578,10 @@ class _KeresoPanelState extends State<KeresoPanel> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(Icons.update, size: 16, color: Colors.blue[700]),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Legutóbbi adatbázis-frissítés: $_utolsoFrissites',
-                        style: TextStyle(
-                          color: Colors.blue[800],
-                          fontSize: 12,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
           const SizedBox(height: 20),
-
-          // 1. ELOSZTÓ KERESŐ MEZŐ
           Card(
             elevation: 2,
             color: Colors.amber[50],
@@ -742,10 +670,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
               ),
             ),
           ),
-
           const SizedBox(height: 20),
-
-          // 2. BERENDEZÉS KERESŐ MEZŐ
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
@@ -850,7 +775,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     );
   }
 
-  // --- BERENDEZÉS ADATLAP NÉZET ---
   Widget _buildBerendezesAdatlapView() {
     final item = _kivalasztottBerendezes!;
     final kodTiszta = item.kod.trim();
@@ -860,7 +784,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // KÉT FÉLE VISSZA GOMB
         Wrap(
           spacing: 10,
           runSpacing: 10,
@@ -870,16 +793,12 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 onPressed: () => _elosztoKivalasztasa(_visszaElosztoNev!),
                 icon: const Icon(Icons.arrow_back, size: 18),
                 label: Text(
-                  'Vissza a elosztóhoz [$_visszaElosztoNev]',
+                  'Vissza az elosztóhoz [$_visszaElosztoNev]',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.amber[100],
                   foregroundColor: Colors.amber[900],
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
                 ),
               ),
             ElevatedButton.icon(
@@ -897,10 +816,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey[200],
                 foregroundColor: Colors.black87,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
               ),
             ),
           ],
@@ -913,7 +828,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
           ),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            key: ValueKey('detail-card-${item.kod}'),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -948,11 +862,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue[50],
-                        elevation: 2,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
-                        ),
                       ),
                     ),
                   ],
@@ -1004,7 +913,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                     leagazasTiszta,
                                     'Leágazás: ${item.leagazasJel}',
                                   ),
-                                  borderRadius: BorderRadius.circular(4),
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 4.0,
@@ -1054,11 +962,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.amber[50],
-                        elevation: 2,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
-                        ),
                       ),
                     ),
                   ],
@@ -1091,7 +994,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     );
   }
 
-  // --- ELOSZTÓ ADATLAP ÉS LEÁGAZÁS LISTA NÉZET ---
   Widget _buildElosztoAdatlapView() {
     final elosztoNev = _kivalasztottElosztoNev!;
     final leagazasok = _mindenAdat
@@ -1118,7 +1020,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.grey[200],
             foregroundColor: Colors.black87,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
         ),
         const SizedBox(height: 15),
@@ -1169,7 +1070,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        elevation: 2,
                       ),
                     ),
                   ],
@@ -1202,13 +1102,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.grey[300]!),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
             ),
             child: ListView.separated(
               itemCount: leagazasok.length,
