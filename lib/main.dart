@@ -94,10 +94,9 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
   bool _isLoading = true;
   String _hibaUzenet = '';
-  String _utolsoFrissites = 'Betöltés...';
 
   static const String _githubAssetsBase =
-      'https://raw.githubusercontent.com/Akipapi27/eromu_app/main/assets/';
+      'https://raw.githubusercontent.com/Akipapi27/eromu_app/main/assets/assets/';
 
   @override
   void initState() {
@@ -245,36 +244,39 @@ class _KeresoPanelState extends State<KeresoPanel> {
     });
   }
 
-  List<String> _osszesKigyujtottKepUrl(String alapNev) {
-    if (alapNev.isEmpty) return [];
+  List<String> _osszesKigyujtottKepUrl(String eredetiAlap) {
+    if (eredetiAlap.isEmpty) return [];
     final buster = _getCacheBuster();
     List<String> urlk = [];
 
-    List<String> extensions = [
-      'jpg',
-      'JPG',
-      'jpeg',
-      'JPEG',
-      'png',
-      'PNG',
-      'webp',
-    ];
-    List<String> names = [
-      alapNev,
-      alapNev.toUpperCase(),
-      alapNev.toLowerCase(),
-    ];
-
-    for (var name in names) {
-      for (var ext in extensions) {
-        urlk.add('$_githubAssetsBase$name.$ext?v=$buster');
+    // Ha betűvel kezdődik, nem alakítjuk át
+    if (RegExp(r'^[a-zA-Z]').hasMatch(eredetiAlap)) {
+      urlk.add('$_githubAssetsBase$eredetiAlap.jpg?v=$buster');
+      for (int i = 1; i <= 9; i++) {
+        urlk.add('$_githubAssetsBase$eredetiAlap-$i.jpg?v=$buster');
       }
+      return urlk;
     }
 
-    for (int i = 1; i <= 5; i++) {
-      for (var ext in extensions) {
-        urlk.add('$_githubAssetsBase$alapNev-$i.$ext?v=$buster');
-      }
+    // Sorszám utótag ellenőrzése a végén (pl. -3)
+    String alap = eredetiAlap;
+    String sorszamUtotag = '';
+    if (RegExp(r'-[1-9]$').hasMatch(alap)) {
+      sorszamUtotag = alap.substring(alap.length - 2);
+      alap = alap.substring(0, alap.length - 2);
+    }
+
+    // Tiszta név képzése (nagybetűs, perjelek és kötőjelek nélkül)
+    String tisztaAlap = alap.toUpperCase();
+    tisztaAlap = tisztaAlap.replaceAll('/', '');
+    tisztaAlap = tisztaAlap.replaceAll('-', '');
+    tisztaAlap = tisztaAlap.replaceAll(' ', '_');
+
+    String veglegesNev = '$tisztaAlap$sorszamUtotag';
+
+    urlk.add('$_githubAssetsBase$veglegesNev.jpg?v=$buster');
+    for (int i = 1; i <= 9; i++) {
+      urlk.add('$_githubAssetsBase$veglegesNev-$i.jpg?v=$buster');
     }
 
     return urlk;
