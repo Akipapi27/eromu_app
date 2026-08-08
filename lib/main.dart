@@ -317,7 +317,8 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
 
-    final leagazasKepszeru = item.leagazasJel.trim().replaceAll(
+    // JAVÍTVA: .toUpperCase() a tisztítás előtt, hogy a kisbetűk ne törlődjenek ki!
+    final leagazasKepszeru = item.leagazasJel.trim().toUpperCase().replaceAll(
       RegExp(r'[^A-Z0-9]'),
       '',
     );
@@ -397,8 +398,9 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
     img.src = '$url?v=${_getCacheBuster()}';
 
+    // JAVÍTVA: 15 másodperc timeout, hogy biztosan legyen ideje válaszolni a szervernek
     return completer.future.timeout(
-      const Duration(seconds: 8),
+      const Duration(seconds: 20),
       onTimeout: () => false,
     );
   }
