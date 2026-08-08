@@ -344,7 +344,10 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
     // 3. Leágazás ellenőrzése az okos keresővel (Ugyanolyan logika, mint a galéria)
     if (leagazasKepszeru.isNotEmpty) {
-      _elerhetoKepekKeresese(leagazasKepszeru).then((kepek) {
+      // Itt azonnal kitisztítjuk a leágazás nevét, mielőtt átadnánk a keresőnek!
+      final tisztaLeagazas = leagazasKepszeru.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
+
+      _elerhetoKepekKeresese(tisztaLeagazas).then((kepek) {
         if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
           setState(() {
             _vanLeagazasKep = kepek.isNotEmpty;
@@ -352,6 +355,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
           });
         }
       });
+    }
     } else {
       setState(() {
         setState(() {
