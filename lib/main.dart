@@ -420,11 +420,12 @@ class _KeresoPanelState extends State<KeresoPanel> {
   Future<List<String>> _elerhetoKepekKeresese(String alapNev) async {
     if (alapNev.isEmpty) return [];
 
+    // Azonnali, szigorú tisztítás a függvény elején, hogy soha ne maradjon benne perjel vagy egyéb szemét
     String tisztaAlapNev = alapNev
         .toUpperCase()
-        .replaceAll('/', '')
-        .replaceAll('-', '')
-        .replaceAll(' ', '');
+        .replaceAll(RegExp(r'[^A-Z0-9]'), '');
+
+    if (tisztaAlapNev.isEmpty) return [];
 
     List<String> talalatok = [];
     final buster = _getCacheBuster();
@@ -452,6 +453,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
     }
 
     return talalatok;
+  }
   }
 
   void _galeriaInditasa(String alapNev, String cim) async {
