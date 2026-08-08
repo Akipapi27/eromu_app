@@ -317,12 +317,10 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
 
-    final leagazasKepszeru = item.leagazasJel
-        .trim()
-        .toUpperCase()
-        .replaceAll('/', '')
-        .replaceAll('-', '')
-        .replaceAll(' ', '');
+    final leagazasKepszeru = item.leagazasJel.trim().toUpperCase().replaceAll(
+      RegExp(r'[^A-Z0-9]'),
+      '',
+    );
 
     final alapMappaUrl = Uri.base.resolve('assets/assets/').toString();
 
@@ -1007,12 +1005,10 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
 
-    final leagazasKepszeru = item.leagazasJel
-        .trim()
-        .toUpperCase()
-        .replaceAll('/', '')
-        .replaceAll('-', '')
-        .replaceAll(' ', '');
+    final leagazasKepszeru = item.leagazasJel.trim().toUpperCase().replaceAll(
+      RegExp(r'[^A-Z0-9]'),
+      '',
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
