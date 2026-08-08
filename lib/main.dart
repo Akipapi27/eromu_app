@@ -318,57 +318,61 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
 
-    // ITT A JAVÍTÁS: A leágazás jelét azonnal letisztítjuk perjel és kötőjel nélkülire
     final leagazasKepszeru = item.leagazasJel
-        .trim() // <--- Ez kigyomlálja a rejtett szóközöket és sorvégeket
+        .trim()
         .toUpperCase()
         .replaceAll('/', '')
         .replaceAll('-', '')
         .replaceAll(' ', '');
 
-    _elerhetoKepekKeresese(kodTiszta).then((kepek) {
-      if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
-        setState(() {
-          _vanBerendezesKep = kepek.isNotEmpty;
-          _berendezesKepToltodik = false;
-        });
-      }
-    });
+    final alapMappaUrl = Uri.base.resolve('assets/assets/').toString();
 
-    if (elosztoTiszta.isNotEmpty) {
-      _elerhetoKepekKeresese(elosztoTiszta).then((kepek) {
+    // 1. Berendezés kép státusz
+    if (kodTiszta.isNotEmpty) {
+      _kepLetezikE('$alapMappaUrl$kodTiszta.jpg').then((letezik) {
         if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
           setState(() {
-            _vanElosztoKep = kepek.isNotEmpty;
+            _vanBerendezesKep = letezik;
+            _berendezesKepToltodik = false;
+          });
+        }
+      });
+    } else {
+      setState(() {
+        _berendezesKepToltodik = false;
+      });
+    }
+
+    // 2. Elosztó kép státusz
+    if (elosztoTiszta.isNotEmpty) {
+      _kepLetezikE('$alapMappaUrl$elosztoTiszta.jpg').then((letezik) {
+        if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
+          setState(() {
+            _vanElosztoKep = letezik;
             _elosztoKepToltodik = false;
           });
         }
       });
     } else {
-      if (mounted) {
-        setState(() {
-          _vanElosztoKep = false;
-          _elosztoKepToltodik = false;
-        });
-      }
+      setState(() {
+        _elosztoKepToltodik = false;
+      });
     }
 
+    // 3. Leágazás kép státusz
     if (leagazasKepszeru.isNotEmpty) {
-      _elerhetoKepekKeresese(leagazasKepszeru).then((kepek) {
+      _kepLetezikE('$alapMappaUrl$leagazasKepszeru.jpg').then((letezik) {
         if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
           setState(() {
-            _vanLeagazasKep = kepek.isNotEmpty;
+            _vanLeagazasKep = letezik;
             _leagazasKepToltodik = false;
           });
         }
       });
     } else {
-      if (mounted) {
-        setState(() {
-          _vanLeagazasKep = false;
-          _leagazasKepToltodik = false;
-        });
-      }
+      setState(() {
+        _leagazasKepToltodik = false;
+      });
     }
   }
 
