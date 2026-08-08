@@ -319,19 +319,12 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final elosztoTiszta = item.elosztoNev.trim();
 
     // ITT A JAVÍTÁS: A leágazás jelét azonnal letisztítjuk perjel és kötőjel nélkülire
-    final elosztoKepszeru = item.elosztoNev
+    final leagazasKepszeru = item.leagazasJel
+        .trim() // <--- Ez kigyomlálja a rejtett szóközöket és sorvégeket
         .toUpperCase()
         .replaceAll('/', '')
         .replaceAll('-', '')
         .replaceAll(' ', '');
-
-    final leagazTisztitott = item.leagazasJel
-        .toUpperCase()
-        .replaceAll('/', '')
-        .replaceAll('-', '')
-        .replaceAll(' ', '');
-
-    final leagazasKepszeru = '$elosztoKepszeru$leagazTisztitott';
 
     _elerhetoKepekKeresese(kodTiszta).then((kepek) {
       if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
@@ -1029,19 +1022,12 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final elosztoTiszta = item.elosztoNev.trim();
 
     // ITT A JAVÍTÁS: A leágazás jelét letisztítjuk, hogy a galériának és a gombnak is a tiszta név (pl. 6DS01) menjen át
-    final elosztoKepszeru = item.elosztoNev
+    final leagazasKepszeru = item.leagazasJel
+        .trim() // <--- Ez kigyomlálja a rejtett szóközöket és sorvégeket
         .toUpperCase()
         .replaceAll('/', '')
         .replaceAll('-', '')
         .replaceAll(' ', '');
-
-    final leagazTisztitott = item.leagazasJel
-        .toUpperCase()
-        .replaceAll('/', '')
-        .replaceAll('-', '')
-        .replaceAll(' ', '');
-
-    final leagazasKepszeru = '$elosztoKepszeru$leagazTisztitott';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
