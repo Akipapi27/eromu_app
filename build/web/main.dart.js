@@ -42291,7 +42291,7 @@ for(;;)switch(s){case 0:if(a.length===0){q=A.c([],t.s)
 s=1
 break}o=A.Yr(a.toUpperCase(),"/","")
 o=A.Yr(o,"-","")
-n=A.Yr(o," ","_")
+n=A.Yr(o," ","")
 m=A.c([],t.s)
 l=B.i.k(Date.now())
 k=A.azG().a3("assets/assets/").k(0)
