@@ -998,7 +998,8 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
 
-    final leagazasKepszeru = item.leagazasJel.trim().replaceAll(
+    // ITT A JAVÍTÁS: Legyen uppercase és szedje ki a perjelt/speciális karaktereket!
+    final leagazasKepszeru = item.leagazasJel.trim().toUpperCase().replaceAll(
       RegExp(r'[^A-Z0-9]'),
       '',
     );
