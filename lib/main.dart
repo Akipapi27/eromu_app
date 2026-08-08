@@ -342,10 +342,12 @@ class _KeresoPanelState extends State<KeresoPanel> {
       }
     });
 
-    // 3. Leágazás ellenőrzése az okos keresővel (Ugyanolyan logika, mint a galéria)
+    // 3. Leágazás ellenőrzése az okos keresővel
     if (leagazasKepszeru.isNotEmpty) {
-      // Itt azonnal kitisztítjuk a leágazás nevét, mielőtt átadnánk a keresőnek!
-      final tisztaLeagazas = leagazasKepszeru.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
+      final tisztaLeagazas = leagazasKepszeru.toUpperCase().replaceAll(
+        RegExp(r'[^A-Z0-9]'),
+        '',
+      );
 
       _elerhetoKepekKeresese(tisztaLeagazas).then((kepek) {
         if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
@@ -357,10 +359,8 @@ class _KeresoPanelState extends State<KeresoPanel> {
       });
     } else {
       setState(() {
-        setState(() {
-          _vanLeagazasKep = false;
-          _leagazasKepToltodik = false;
-        });
+        _vanLeagazasKep = false;
+        _leagazasKepToltodik = false;
       });
     }
   }
@@ -392,7 +392,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
     img.src = '$url?v=${_getCacheBuster()}';
 
-    // JAVÍTVA: 15 másodperc timeout, hogy biztosan legyen ideje válaszolni a szervernek
     return completer.future.timeout(
       const Duration(seconds: 20),
       onTimeout: () => false,
@@ -423,10 +422,10 @@ class _KeresoPanelState extends State<KeresoPanel> {
   Future<List<String>> _elerhetoKepekKeresese(String alapNev) async {
     if (alapNev.isEmpty) return [];
 
-    // Azonnali, szigorú tisztítás a függvény elején, hogy soha ne maradjon benne perjel vagy egyéb szemét
-    String tisztaAlapNev = alapNev
-        .toUpperCase()
-        .replaceAll(RegExp(r'[^A-Z0-9]'), '');
+    String tisztaAlapNev = alapNev.toUpperCase().replaceAll(
+      RegExp(r'[^A-Z0-9]'),
+      '',
+    );
 
     if (tisztaAlapNev.isEmpty) return [];
 
@@ -457,7 +456,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
     return talalatok;
   }
-  }
 
   void _galeriaInditasa(String alapNev, String cim) async {
     showDialog(
@@ -486,7 +484,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
     int aktualisIndex = 0;
     final TransformationController transformCtrl = TransformationController();
 
-    void _regisztralKepatmero(String url, int index) {
+    void regisztralKepatmero(String url, int index) {
       ui.platformViewRegistry.registerViewFactory(
         'html-image-$egyediAzonosito-$index',
         (int viewId) => html.ImageElement()
@@ -497,7 +495,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
       );
     }
 
-    _regisztralKepatmero(kepUrl_ek[aktualisIndex], aktualisIndex);
+    regisztralKepatmero(kepUrl_ek[aktualisIndex], aktualisIndex);
 
     showGeneralDialog(
       context: context,
@@ -611,7 +609,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                         aktualisIndex--;
                                         transformCtrl.value =
                                             Matrix4.identity();
-                                        _regisztralKepatmero(
+                                        regisztralKepatmero(
                                           kepUrl_ek[aktualisIndex],
                                           aktualisIndex,
                                         );
@@ -632,7 +630,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                         aktualisIndex++;
                                         transformCtrl.value =
                                             Matrix4.identity();
-                                        _regisztralKepatmero(
+                                        regisztralKepatmero(
                                           kepUrl_ek[aktualisIndex],
                                           aktualisIndex,
                                         );
@@ -1003,7 +1001,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
 
-    // ITT A JAVÍTÁS: Legyen uppercase és szedje ki a perjelt/speciális karaktereket!
     final leagazasKepszeru = item.leagazasJel.trim().toUpperCase().replaceAll(
       RegExp(r'[^A-Z0-9]'),
       '',
@@ -1064,7 +1061,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
           ),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            key: ValueKey('detail-card-${item.kod}'),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
