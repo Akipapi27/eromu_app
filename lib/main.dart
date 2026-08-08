@@ -428,11 +428,18 @@ class _KeresoPanelState extends State<KeresoPanel> {
   Future<List<String>> _elerhetoKepekKeresese(String alapNev) async {
     if (alapNev.isEmpty) return [];
 
-    // Itt távolítjuk el a perjeleket (pl. 6DS/01 -> 6DS01), hogy megegyezzen a lemezen lévő fájlnévvel
-    final tisztaAlapNev = alapNev.replaceAll('/', '');
+    // 1. TÖKÉLETES TISZTÍTÁS: Ugyanazt csinálja, mint a Mac-es frissítő scripted!
+    // Nagybetűssé alakít, perjeleket és kötőjeleket töröl, szóközöket aláhúzásra cserél.
+    String tisztaAlapNev = alapNev
+        .toUpperCase()
+        .replaceAll('/', '')
+        .replaceAll('-', '')
+        .replaceAll(' ', '_');
 
     List<String> talalatok = [];
     final buster = _getCacheBuster();
+
+    // 2. A Flutter Web belső assets mappája
     final alapMappaUrl = Uri.base.resolve('assets/assets/').toString();
 
     final elsoTalalatUrl = await _keresElerhetoKepet(
