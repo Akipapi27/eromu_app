@@ -317,7 +317,13 @@ class _KeresoPanelState extends State<KeresoPanel> {
   void _pahrhuzamosKepStatuszEllenorzes(BerendezesAdat item) {
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
-    final leagazasTiszta = item.leagazasJel.trim();
+
+    // ITT A JAVÍTÁS: A leágazás jelét azonnal letisztítjuk perjel és kötőjel nélkülire
+    final leagazasKepszeru = item.leagazasJel
+        .toUpperCase()
+        .replaceAll('/', '')
+        .replaceAll('-', '')
+        .replaceAll(' ', '');
 
     _elerhetoKepekKeresese(kodTiszta).then((kepek) {
       if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
@@ -346,8 +352,8 @@ class _KeresoPanelState extends State<KeresoPanel> {
       }
     }
 
-    if (leagazasTiszta.isNotEmpty) {
-      _elerhetoKepekKeresese(leagazasTiszta).then((kepek) {
+    if (leagazasKepszeru.isNotEmpty) {
+      _elerhetoKepekKeresese(leagazasKepszeru).then((kepek) {
         if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
           setState(() {
             _vanLeagazasKep = kepek.isNotEmpty;
@@ -428,7 +434,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
   Future<List<String>> _elerhetoKepekKeresese(String alapNev) async {
     if (alapNev.isEmpty) return [];
 
-    // Eltávolítunk minden perjelet, kötőjelet, szóközt, és nagybetűsítünk
     String tisztaAlapNev = alapNev
         .toUpperCase()
         .replaceAll('/', '')
@@ -1014,7 +1019,13 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final item = _kivalasztottBerendezes!;
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
-    final leagazasTiszta = item.leagazasJel.trim();
+
+    // ITT A JAVÍTÁS: A leágazás jelét letisztítjuk, hogy a galériának és a gombnak is a tiszta név (pl. 6DS01) menjen át
+    final leagazasKepszeru = item.leagazasJel
+        .toUpperCase()
+        .replaceAll('/', '')
+        .replaceAll('-', '')
+        .replaceAll(' ', '');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1194,7 +1205,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                         ? null
                                         : (_vanLeagazasKep
                                               ? () => _galeriaInditasa(
-                                                  leagazasTiszta,
+                                                  leagazasKepszeru, // JAVÍTVA: a tiszta név megy át
                                                   'Leágazás: ${item.leagazasJel}',
                                                 )
                                               : () => _nincsKepUzenet(context)),
