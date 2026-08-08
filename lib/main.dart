@@ -355,7 +355,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
           });
         }
       });
-    }
     } else {
       setState(() {
         setState(() {
