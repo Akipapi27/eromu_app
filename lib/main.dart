@@ -87,7 +87,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
   BerendezesAdat? _kivalasztottBerendezes;
   String? _kivalasztottElosztoNev;
-  String? _visszaElosztoNev; // Megjegyzi, ha elosztóból léptünk a berendezésre
+  String? _visszaElosztoNev;
 
   NezetTipus _aktualisNezet = NezetTipus.kereso;
 
@@ -98,7 +98,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
   String _hibaUzenet = '';
   String _utolsoFrissites = 'Betöltés...';
 
-  // Képállapotok
   bool _vanBerendezesKep = false;
   bool _vanElosztoKep = false;
   bool _vanLeagazasKep = false;
@@ -327,7 +326,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
     final alapMappaUrl = Uri.base.resolve('assets/assets/').toString();
 
-    // 1. Berendezés kép státusz
     if (kodTiszta.isNotEmpty) {
       _kepLetezikE('$alapMappaUrl$kodTiszta.jpg').then((letezik) {
         if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
@@ -343,7 +341,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
       });
     }
 
-    // 2. Elosztó kép státusz
     if (elosztoTiszta.isNotEmpty) {
       _kepLetezikE('$alapMappaUrl$elosztoTiszta.jpg').then((letezik) {
         if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
@@ -359,7 +356,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
       });
     }
 
-    // 3. Leágazás kép státusz
     if (leagazasKepszeru.isNotEmpty) {
       _kepLetezikE('$alapMappaUrl$leagazasKepszeru.jpg').then((letezik) {
         if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
@@ -414,23 +410,17 @@ class _KeresoPanelState extends State<KeresoPanel> {
     String fajlNev,
   ) async {
     List<String> verziok = [
-      '$alapMappaUrl${fajlNev.toLowerCase()}.webp',
-      '$alapMappaUrl${fajlNev.toLowerCase()}.jpg',
-      '$alapMappaUrl${fajlNev.toLowerCase()}.png',
-      '$alapMappaUrl${fajlNev.toUpperCase()}.webp',
-      '$alapMappaUrl${fajlNev.toUpperCase()}.jpg',
-      '$alapMappaUrl${fajlNev.toUpperCase()}.png',
-      '$alapMappaUrl$fajlNev.webp',
       '$alapMappaUrl$fajlNev.jpg',
-      '$alapMappaUrl$fajlNev.png',
+      '$alapMappaUrl$fajlNev.JPG',
+      '$alapMappaUrl${fajlNev.toLowerCase()}.jpg',
+      '$alapMappaUrl${fajlNev.toLowerCase()}.JPG',
+      '$alapMappaUrl${fajlNev.toLowerCase()}.webp',
+      '$alapMappaUrl${fajlNev.toLowerCase()}.png',
     ];
 
-    final ellenorzesek = verziok.map((u) => _kepLetezikE(u)).toList();
-    final eredmenyek = await Future.wait(ellenorzesek);
-
-    for (int i = 0; i < eredmenyek.length; i++) {
-      if (eredmenyek[i]) {
-        return verziok[i];
+    for (var url in verziok) {
+      if (await _kepLetezikE(url)) {
+        return url;
       }
     }
     return null;
@@ -457,15 +447,13 @@ class _KeresoPanelState extends State<KeresoPanel> {
       talalatok.add('$elsoTalalatUrl?v=$buster');
     }
 
-    final sorszamosKeresesek = List.generate(
-      9,
-      (i) => _keresElerhetoKepet(alapMappaUrl, '$tisztaAlapNev-${i + 1}'),
-    );
-    final sorszamosTalalatok = await Future.wait(sorszamosKeresesek);
-
-    for (var talalatUrl in sorszamosTalalatok) {
-      if (talalatUrl != null) {
-        final teljesUrl = '$talalatUrl?v=$buster';
+    for (int i = 1; i <= 9; i++) {
+      final sorszamosUrl = await _keresElerhetoKepet(
+        alapMappaUrl,
+        '$tisztaAlapNev-$i',
+      );
+      if (sorszamosUrl != null) {
+        final teljesUrl = '$sorszamosUrl?v=$buster';
         if (!talalatok.contains(teljesUrl)) {
           talalatok.add(teljesUrl);
         }
@@ -821,8 +809,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
             ),
           ),
           const SizedBox(height: 20),
-
-          // 1. ELOSZTÓ KERESŐ MEZŐ
           Card(
             elevation: 2,
             color: Colors.amber[50],
@@ -911,10 +897,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
               ),
             ),
           ),
-
           const SizedBox(height: 20),
-
-          // 2. BERENDEZÉS KERESŐ MEZŐ
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
@@ -1019,15 +1002,13 @@ class _KeresoPanelState extends State<KeresoPanel> {
     );
   }
 
-  // --- BERENDEZÉS ADATLAP NÉZET ---
   Widget _buildBerendezesAdatlapView() {
     final item = _kivalasztottBerendezes!;
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
 
-    // ITT A JAVÍTÁS: A leágazás jelét letisztítjuk, hogy a galériának és a gombnak is a tiszta név (pl. 6DS01) menjen át
     final leagazasKepszeru = item.leagazasJel
-        .trim() // <--- Ez kigyomlálja a rejtett szóközöket és sorvégeket
+        .trim()
         .toUpperCase()
         .replaceAll('/', '')
         .replaceAll('-', '')
@@ -1036,7 +1017,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // KÉT FÉLE VISSZA GOMB
         Wrap(
           spacing: 10,
           runSpacing: 10,
@@ -1211,7 +1191,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                         ? null
                                         : (_vanLeagazasKep
                                               ? () => _galeriaInditasa(
-                                                  leagazasKepszeru, // JAVÍTVA: a tiszta név megy át
+                                                  leagazasKepszeru,
                                                   'Leágazás: ${item.leagazasJel}',
                                                 )
                                               : () => _nincsKepUzenet(context)),
@@ -1332,7 +1312,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     );
   }
 
-  // --- ELOSZTÓ ADATLAP ÉS LEÁGAZÁS LISTA NÉZET ---
   Widget _buildElosztoAdatlapView() {
     final elosztoNev = _kivalasztottElosztoNev!;
     final leagazasok = _mindenAdat
