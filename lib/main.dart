@@ -313,60 +313,51 @@ class _KeresoPanelState extends State<KeresoPanel> {
     });
   }
 
-  void _pahrhuzamosKepStatuszEllenorzes(BerendezesAdat item) {
+  void _pahrhuzamosKepStatuszEllenorzes(BerendezesAdat item) async {
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
 
-    // JAVÍTVA: .toUpperCase() a tisztítás előtt, hogy a kisbetűk ne törlődjenek ki!
     final leagazasKepszeru = item.leagazasJel.trim().toUpperCase().replaceAll(
       RegExp(r'[^A-Z0-9]'),
       '',
     );
 
-    final alapMappaUrl = Uri.base.resolve('assets/assets/').toString();
+    // 1. Berendezés ellenőrzése az okos keresővel
+    _elerhetoKepekKeresese(kodTiszta).then((kepek) {
+      if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
+        setState(() {
+          _vanBerendezesKep = kepek.isNotEmpty;
+          _berendezesKepToltodik = false;
+        });
+      }
+    });
 
-    if (kodTiszta.isNotEmpty) {
-      _kepLetezikE('$alapMappaUrl$kodTiszta.jpg').then((letezik) {
-        if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
-          setState(() {
-            _vanBerendezesKep = letezik;
-            _berendezesKepToltodik = false;
-          });
-        }
-      });
-    } else {
-      setState(() {
-        _berendezesKepToltodik = false;
-      });
-    }
+    // 2. Elosztó ellenőrzése az okos keresővel
+    _elerhetoKepekKeresese(elosztoTiszta).then((kepek) {
+      if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
+        setState(() {
+          _vanElosztoKep = kepek.isNotEmpty;
+          _elosztoKepToltodik = false;
+        });
+      }
+    });
 
-    if (elosztoTiszta.isNotEmpty) {
-      _kepLetezikE('$alapMappaUrl$elosztoTiszta.jpg').then((letezik) {
-        if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
-          setState(() {
-            _vanElosztoKep = letezik;
-            _elosztoKepToltodik = false;
-          });
-        }
-      });
-    } else {
-      setState(() {
-        _elosztoKepToltodik = false;
-      });
-    }
-
+    // 3. Leágazás ellenőrzése az okos keresővel (Ugyanolyan logika, mint a galéria)
     if (leagazasKepszeru.isNotEmpty) {
-      _kepLetezikE('$alapMappaUrl$leagazasKepszeru.jpg').then((letezik) {
+      _elerhetoKepekKeresese(leagazasKepszeru).then((kepek) {
         if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
           setState(() {
-            _vanLeagazasKep = letezik;
+            _vanLeagazasKep = kepek.isNotEmpty;
             _leagazasKepToltodik = false;
           });
         }
       });
     } else {
       setState(() {
-        _leagazasKepToltodik = false;
+        setState(() {
+          _vanLeagazasKep = false;
+          _leagazasKepToltodik = false;
+        });
       });
     }
   }
