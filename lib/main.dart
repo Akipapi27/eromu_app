@@ -317,7 +317,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
 
-    final leagazasKepszeru = item.leagazasJel.trim().toUpperCase().replaceAll(
+    final leagazasKepszeru = item.leagazasJel.trim().replaceAll(
       RegExp(r'[^A-Z0-9]'),
       '',
     );
@@ -1005,7 +1005,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final kodTiszta = item.kod.trim();
     final elosztoTiszta = item.elosztoNev.trim();
 
-    final leagazasKepszeru = item.leagazasJel.trim().toUpperCase().replaceAll(
+    final leagazasKepszeru = item.leagazasJel.trim().replaceAll(
       RegExp(r'[^A-Z0-9]'),
       '',
     );
