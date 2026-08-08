@@ -42317,7 +42317,7 @@ o=A.vW(o,"-","")
 n=A.vW(o," ","")
 m=A.c([],t.s)
 l=B.i.k(Date.now())
-k=A.azG().a3("assets/assets/").k(0)
+k=A.azG().a3("assets/").k(0)
 s=3
 return A.W(p.rN(k,n),$async$kD)
 case 3:j=c

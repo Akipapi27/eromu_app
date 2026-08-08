@@ -428,7 +428,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
     List<String> talalatok = [];
     final buster = _getCacheBuster();
-    final alapMappaUrl = Uri.base.resolve('assets/assets/').toString();
+    final alapMappaUrl = Uri.base.resolve('assets/').toString();
 
     final elsoTalalatUrl = await _keresElerhetoKepet(
       alapMappaUrl,
