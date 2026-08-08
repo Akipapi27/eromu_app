@@ -400,7 +400,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
     img.src = '$url?v=${_getCacheBuster()}';
 
     return completer.future.timeout(
-      const Duration(seconds: 2),
+      const Duration(seconds: 8),
       onTimeout: () => false,
     );
   }
