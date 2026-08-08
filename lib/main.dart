@@ -427,18 +427,25 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
   Future<List<String>> _elerhetoKepekKeresese(String alapNev) async {
     if (alapNev.isEmpty) return [];
+
+    // Itt távolítjuk el a perjeleket (pl. 6DS/01 -> 6DS01), hogy megegyezzen a lemezen lévő fájlnévvel
+    final tisztaAlapNev = alapNev.replaceAll('/', '');
+
     List<String> talalatok = [];
     final buster = _getCacheBuster();
     final alapMappaUrl = Uri.base.resolve('assets/assets/').toString();
 
-    final elsoTalalatUrl = await _keresElerhetoKepet(alapMappaUrl, alapNev);
+    final elsoTalalatUrl = await _keresElerhetoKepet(
+      alapMappaUrl,
+      tisztaAlapNev,
+    );
     if (elsoTalalatUrl != null) {
       talalatok.add('$elsoTalalatUrl?v=$buster');
     }
 
     final sorszamosKeresesek = List.generate(
       9,
-      (i) => _keresElerhetoKepet(alapMappaUrl, '$alapNev-${i + 1}'),
+      (i) => _keresElerhetoKepet(alapMappaUrl, '$tisztaAlapNev-${i + 1}'),
     );
     final sorszamosTalalatok = await Future.wait(sorszamosKeresesek);
 
