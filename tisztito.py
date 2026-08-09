@@ -11,7 +11,7 @@ def frissit():
     temp_images_dir = os.path.join(home, 'Developer', 'ideiglenes képek')
     project_assets_dir = 'assets'
     
-    print("--- 1. JSON tisztítása (leagazasJel és kod mezők) ---")
+    print("--- 1. JSON tisztítása (eloszto alapú leagazasJel és kod mezők) ---")
     if os.path.exists(downloads_json):
         try:
             # Beolvassuk a Letöltésekben lévő JSON-t
@@ -20,10 +20,27 @@ def frissit():
             
             valtozasok_szama = 0
             for item in data:
-                # 1. leagazasJel tisztítása
+                # Elosztó név megkeresése a rekordban (többféle lehetséges mezőnév ellenőrzése)
+                eloszto_mezok = ['eloszto', 'taplaloEloszto', 'elosztoNeve', 'elosztoJel']
+                eloszto_neve = None
+                for mezor in eloszto_mezok:
+                    if mezor in item and item[mezor]:
+                        eloszto_neve = str(item[mezor]).upper().strip()
+                        eloszto_neve = re.sub(r'[^A-Z0-9]+', '_', eloszto_neve).strip('_')
+                        break
+
+                # 1. leagazasJel tisztítása és elosztó szerinti elválasztása
                 if 'leagazasJel' in item and item['leagazasJel']:
                     eredeti = item['leagazasJel']
                     tiszta = re.sub(r'[^A-Z0-9]+', '_', eredeti.upper()).strip('_')
+                    
+                    # Ha megvan az elosztó neve, és a leágazás ezzel kezdődik
+                    if eloszto_neve and tiszta.startswith(eloszto_neve):
+                        maradek = tiszta[len(eloszto_neve):]
+                        # Ha van karakter az elosztónév után, de nincs ott aláhúzás, beszúrjuk
+                        if maradek and not maradek.startswith('_'):
+                            tiszta = eloszto_neve + '_' + maradek.lstrip('_')
+
                     if eredeti != tiszta:
                         item['leagazasJel'] = tiszta
                         valtozasok_szama += 1
@@ -76,7 +93,7 @@ def frissit():
         if status.returncode == 0:
             print("Nincs változás a repóban, nincs mit feltölteni.")
         else:
-            subprocess.run(["git", "commit", "-m", "Automata frissites: kod es leagazas tisztitas, kepek, torlesek"], check=True)
+            subprocess.run(["git", "commit", "-m", "Automata frissites: eloszto alapu leagazas es kod tisztitas, kepek, torlesek"], check=True)
             subprocess.run(["git", "push", "origin", "main"], check=True)
             print("\nMinden sikeresen felkerült a GitHubra!")
             
