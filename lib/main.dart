@@ -114,6 +114,14 @@ class _KeresoPanelState extends State<KeresoPanel> {
     _elosztoKeresoCtrl.addListener(_elosztoSzuresVegrehajtasa);
   }
 
+  String _keresHelyszin(String kod) {
+    if (kod.isEmpty) return 'Nincs megadva';
+    final talalat = _mindenAdat.where(
+      (e) => e.kod.trim().toLowerCase() == kod.trim().toLowerCase(),
+    );
+    return talalat.isNotEmpty ? talalat.first.helyszin : 'Nincs megadva';
+  }
+
   String _getCacheBuster() {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }
@@ -1179,7 +1187,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'Elosztó helye: ${item.elosztoHelye}',
+                            'Elosztó helye: ${_keresHelyszin(item.elosztoNev)}',
                             style: TextStyle(
                               color: Colors.grey[800],
                               fontSize: 14,
@@ -1389,7 +1397,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Elosztó fizikai helye: $elosztoHelye',
+                  'Elosztó fizikai helye: ${_keresHelyszin(elosztoNev)}',
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
