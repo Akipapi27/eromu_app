@@ -191,29 +191,22 @@ class _KeresoPanelState extends State<KeresoPanel> {
           .map((item) => BerendezesAdat.fromJson(item))
           .toList();
 
-      Map<String, _ElosztoInfo> legfrissebbElosztok = {};
+      // Gyűjtsük össze az elosztók helyszínét a saját rekordjukból (ahol a kód megegyezik az elosztó nevével)
+      Map<String, String> elosztokHelyszine = {};
       for (var item in list) {
-        final elosztoTiszta = item.elosztoNev.trim().toLowerCase();
-        if (elosztoTiszta.isEmpty) continue;
-        if (!legfrissebbElosztok.containsKey(elosztoTiszta)) {
-          legfrissebbElosztok[elosztoTiszta] = _ElosztoInfo(
-            item.elosztoHelye,
-            item.verzio,
-          );
-        } else {
-          if (item.verzio > legfrissebbElosztok[elosztoTiszta]!.verzio) {
-            legfrissebbElosztok[elosztoTiszta] = _ElosztoInfo(
-              item.elosztoHelye,
-              item.verzio,
-            );
-          }
+        final kodTiszta = item.kod.trim().toLowerCase();
+        if (kodTiszta.isNotEmpty && item.helyszin.isNotEmpty) {
+          elosztokHelyszine[kodTiszta] = item.helyszin;
         }
       }
 
+      // Minden berendezésnél az elosztoHelye legyen annak az elosztónak a helyszíne, amelyik táplálja
       for (var item in list) {
         final elosztoTiszta = item.elosztoNev.trim().toLowerCase();
-        if (legfrissebbElosztok.containsKey(elosztoTiszta)) {
-          item.elosztoHelye = legfrissebbElosztok[elosztoTiszta]!.hely;
+        if (elosztokHelyszine.containsKey(elosztoTiszta)) {
+          item.elosztoHelye = elosztokHelyszine[elosztoTiszta]!;
+        } else {
+          item.elosztoHelye = 'Nincs megadva';
         }
       }
 
@@ -1285,8 +1278,16 @@ class _KeresoPanelState extends State<KeresoPanel> {
         )
         .toList();
 
+    // Megkeressük magának az elosztónak a saját rekordját, hogy az ő helyszínét mutassuk
     String elosztoHelye = 'Nincs megadva';
-    if (leagazasok.isNotEmpty) {
+    final elosztoElem = _mindenAdat.cast<BerendezesAdat?>().firstWhere(
+      (e) => e?.kod.trim().toLowerCase() == elosztoNev.toLowerCase(),
+      orElse: () => null,
+    );
+
+    if (elosztoElem != null && elosztoElem.helyszin.isNotEmpty) {
+      elosztoHelye = elosztoElem.helyszin;
+    } else if (leagazasok.isNotEmpty) {
       elosztoHelye = leagazasok.first.elosztoHelye;
     }
 
