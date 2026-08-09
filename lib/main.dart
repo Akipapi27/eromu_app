@@ -118,14 +118,31 @@ class _KeresoPanelState extends State<KeresoPanel> {
     if (kod.isEmpty) return 'Nincs megadva';
     final tisztaKeresett = kod.trim().toLowerCase();
 
-    // Keresés pontos kód vagy megnevezés alapján
-    final talalat = _mindenAdat.where(
-      (e) =>
-          e.kod.trim().toLowerCase() == tisztaKeresett ||
-          e.megnevezes.trim().toLowerCase().startsWith(tisztaKeresett),
+    // 1. Pontos kód egyezés
+    var talalat = _mindenAdat.where(
+      (e) => e.kod.trim().toLowerCase() == tisztaKeresett,
     );
-
     for (var item in talalat) {
+      if (item.helyszin.isNotEmpty) {
+        return item.helyszin;
+      }
+    }
+
+    // 2. Megnevezés alapú keresés
+    talalat = _mindenAdat.where(
+      (e) => e.megnevezes.trim().toLowerCase().contains(tisztaKeresett),
+    );
+    for (var item in talalat) {
+      if (item.helyszin.isNotEmpty) {
+        return item.helyszin;
+      }
+    }
+
+    // 3. TARTALÉK: Ha elosztóként keresik, nézzük meg a benne lévő leágazások helyszínét is!
+    final leagazasok = _mindenAdat.where(
+      (e) => e.elosztoNev.trim().toLowerCase() == tisztaKeresett,
+    );
+    for (var item in leagazasok) {
       if (item.helyszin.isNotEmpty) {
         return item.helyszin;
       }
@@ -1281,6 +1298,16 @@ class _KeresoPanelState extends State<KeresoPanel> {
         )
         .toList();
 
+    // Elosztó helyének meghatározása a fenti okos keresővel + tartalékkal
+    String elosztoHelye = _keresHelyszin(elosztoNev);
+    if (elosztoHelye == 'Nincs megadva' && leagazasok.isNotEmpty) {
+      for (var l in leagazasok) {
+        if (l.helyszin.isNotEmpty) {
+          elosztoHelye = l.helyszin;
+          break;
+        }
+      }
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
