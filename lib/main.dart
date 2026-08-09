@@ -314,16 +314,12 @@ class _KeresoPanelState extends State<KeresoPanel> {
   }
 
   void _pahrhuzamosKepStatuszEllenorzes(BerendezesAdat item) async {
-    final kodTiszta = item.kod.trim();
-    final elosztoTiszta = item.elosztoNev.trim();
+    final kodNev = item.kod.trim().toUpperCase();
+    final elosztoNev = item.elosztoNev.trim().toUpperCase();
+    final leagazasNev = item.leagazasJel.trim().toUpperCase();
 
-    final leagazasKepszeru = item.leagazasJel.trim().toUpperCase().replaceAll(
-      RegExp(r'[^A-Z0-9]'),
-      '',
-    );
-
-    // 1. Berendezés ellenőrzése az okos keresővel
-    _elerhetoKepekKeresese(kodTiszta).then((kepek) {
+    // 1. Berendezés ellenőrzése
+    _elerhetoKepekKeresese(kodNev).then((kepek) {
       if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
         setState(() {
           _vanBerendezesKep = kepek.isNotEmpty;
@@ -332,8 +328,8 @@ class _KeresoPanelState extends State<KeresoPanel> {
       }
     });
 
-    // 2. Elosztó ellenőrzése az okos keresővel
-    _elerhetoKepekKeresese(elosztoTiszta).then((kepek) {
+    // 2. Elosztó ellenőrzése
+    _elerhetoKepekKeresese(elosztoNev).then((kepek) {
       if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
         setState(() {
           _vanElosztoKep = kepek.isNotEmpty;
@@ -342,14 +338,9 @@ class _KeresoPanelState extends State<KeresoPanel> {
       }
     });
 
-    // 3. Leágazás ellenőrzése az okos keresővel
-    if (leagazasKepszeru.isNotEmpty) {
-      final tisztaLeagazas = leagazasKepszeru.toUpperCase().replaceAll(
-        RegExp(r'[^A-Z0-9]'),
-        '',
-      );
-
-      _elerhetoKepekKeresese(tisztaLeagazas).then((kepek) {
+    // 3. Leágazás ellenőrzése
+    if (leagazasNev.isNotEmpty) {
+      _elerhetoKepekKeresese(leagazasNev).then((kepek) {
         if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
           setState(() {
             _vanLeagazasKep = kepek.isNotEmpty;
@@ -379,23 +370,12 @@ class _KeresoPanelState extends State<KeresoPanel> {
   }
 
   Future<bool> _kepLetezikE(String url) async {
-    final completer = Completer<bool>();
-    final img = html.ImageElement();
-
-    img.onLoad.listen((_) {
-      if (!completer.isCompleted) completer.complete(true);
-    });
-
-    img.onError.listen((_) {
-      if (!completer.isCompleted) completer.complete(false);
-    });
-
-    img.src = '$url?v=${_getCacheBuster()}';
-
-    return completer.future.timeout(
-      const Duration(seconds: 20),
-      onTimeout: () => false,
-    );
+    try {
+      final response = await http.get(Uri.parse(url));
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<String?> _keresElerhetoKepet(
@@ -422,17 +402,14 @@ class _KeresoPanelState extends State<KeresoPanel> {
   Future<List<String>> _elerhetoKepekKeresese(String alapNev) async {
     if (alapNev.isEmpty) return [];
 
-    String tisztaAlapNev = alapNev.toUpperCase().replaceAll(
-      RegExp(r'[^A-Z0-9]'),
-      '',
-    );
-
+    String tisztaAlapNev = alapNev.trim().toUpperCase();
     if (tisztaAlapNev.isEmpty) return [];
 
     List<String> talalatok = [];
     final buster = _getCacheBuster();
     final alapMappaUrl = Uri.base.resolve('assets/').toString();
 
+    // Alap kép keresése (pl. 6DS01.jpg)
     final elsoTalalatUrl = await _keresElerhetoKepet(
       alapMappaUrl,
       tisztaAlapNev,
@@ -441,6 +418,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
       talalatok.add('$elsoTalalatUrl?v=$buster');
     }
 
+    // Sorszámozott képek keresése (pl. 6DS01-1.jpg ... 6DS01-9.jpg)
     for (int i = 1; i <= 9; i++) {
       final sorszamosUrl = await _keresElerhetoKepet(
         alapMappaUrl,
@@ -998,13 +976,9 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
   Widget _buildBerendezesAdatlapView() {
     final item = _kivalasztottBerendezes!;
-    final kodTiszta = item.kod.trim();
-    final elosztoTiszta = item.elosztoNev.trim();
-
-    final leagazasKepszeru = item.leagazasJel.trim().toUpperCase().replaceAll(
-      RegExp(r'[^A-Z0-9]'),
-      '',
-    );
+    final kodNev = item.kod.trim().toUpperCase();
+    final elosztoNev = item.elosztoNev.trim().toUpperCase();
+    final leagazasNev = item.leagazasJel.trim().toUpperCase();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1086,7 +1060,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                             ? null
                             : (_vanBerendezesKep
                                   ? () => _galeriaInditasa(
-                                      kodTiszta,
+                                      kodNev,
                                       'Berendezés: ${item.megnevezes}',
                                     )
                                   : () => _nincsKepUzenet(context)),
@@ -1182,7 +1156,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                         ? null
                                         : (_vanLeagazasKep
                                               ? () => _galeriaInditasa(
-                                                  leagazasKepszeru,
+                                                  leagazasNev,
                                                   'Leágazás: ${item.leagazasJel}',
                                                 )
                                               : () => _nincsKepUzenet(context)),
@@ -1232,7 +1206,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                             ? null
                             : (_vanElosztoKep
                                   ? () => _galeriaInditasa(
-                                      elosztoTiszta,
+                                      elosztoNev,
                                       'Elosztó: ${item.elosztoNev}',
                                     )
                                   : () => _nincsKepUzenet(context)),
@@ -1373,7 +1347,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                             ? null
                             : (_vanElosztoKep
                                   ? () => _galeriaInditasa(
-                                      elosztoNev,
+                                      elosztoNev.toUpperCase(),
                                       'Elosztó: $elosztoNev',
                                     )
                                   : () => _nincsKepUzenet(context)),
