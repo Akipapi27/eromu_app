@@ -116,12 +116,22 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
   String _keresHelyszin(String kod) {
     if (kod.isEmpty) return 'Nincs megadva';
+    final tisztaKeresett = kod.trim().toLowerCase();
+
+    // Keresés pontos kód vagy megnevezés alapján
     final talalat = _mindenAdat.where(
-      (e) => e.kod.trim().toLowerCase() == kod.trim().toLowerCase(),
+      (e) =>
+          e.kod.trim().toLowerCase() == tisztaKeresett ||
+          e.megnevezes.trim().toLowerCase().startsWith(tisztaKeresett),
     );
-    return talalat.isNotEmpty && talalat.first.helyszin.isNotEmpty
-        ? talalat.first.helyszin
-        : 'Nincs megadva';
+
+    for (var item in talalat) {
+      if (item.helyszin.isNotEmpty) {
+        return item.helyszin;
+      }
+    }
+
+    return 'Nincs megadva';
   }
 
   String _getCacheBuster() {
@@ -242,11 +252,13 @@ class _KeresoPanelState extends State<KeresoPanel> {
       return;
     }
 
-    final egyediElosztok = _mindenAdat
-        .map((e) => e.elosztoNev.trim())
-        .where((e) => e.isNotEmpty)
-        .toSet()
-        .toList();
+    // Gyűjtsük össze az elosztókat a kod ÉS az elosztoNev mezőből is!
+    final egyediElosztok = <String>{};
+    for (var e in _mindenAdat) {
+      if (e.kod.trim().isNotEmpty) egyediElosztok.add(e.kod.trim());
+      if (e.elosztoNev.trim().isNotEmpty)
+        egyediElosztok.add(e.elosztoNev.trim());
+    }
 
     setState(() {
       _szurtElosztoLista = egyediElosztok.where((e) {
