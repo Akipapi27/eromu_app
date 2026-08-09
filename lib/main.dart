@@ -119,7 +119,9 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final talalat = _mindenAdat.where(
       (e) => e.kod.trim().toLowerCase() == kod.trim().toLowerCase(),
     );
-    return talalat.isNotEmpty ? talalat.first.helyszin : 'Nincs megadva';
+    return talalat.isNotEmpty && talalat.first.helyszin.isNotEmpty
+        ? talalat.first.helyszin
+        : 'Nincs megadva';
   }
 
   String _getCacheBuster() {
@@ -198,25 +200,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
       final list = jsonLista
           .map((item) => BerendezesAdat.fromJson(item))
           .toList();
-
-      // Gyűjtsük össze az elosztók helyszínét a saját rekordjukból (ahol a kód megegyezik az elosztó nevével)
-      Map<String, String> elosztokHelyszine = {};
-      for (var item in list) {
-        final kodTiszta = item.kod.trim().toLowerCase();
-        if (kodTiszta.isNotEmpty && item.helyszin.isNotEmpty) {
-          elosztokHelyszine[kodTiszta] = item.helyszin;
-        }
-      }
-
-      // Minden berendezésnél az elosztoHelye legyen annak az elosztónak a helyszíne, amelyik táplálja
-      for (var item in list) {
-        final elosztoTiszta = item.elosztoNev.trim().toLowerCase();
-        if (elosztokHelyszine.containsKey(elosztoTiszta)) {
-          item.elosztoHelye = elosztokHelyszine[elosztoTiszta]!;
-        } else {
-          item.elosztoHelye = 'Nincs megadva';
-        }
-      }
 
       setState(() {
         _mindenAdat = list;
@@ -1286,19 +1269,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
         )
         .toList();
 
-    // Megkeressük magának az elosztónak a saját rekordját, hogy az ő helyszínét mutassuk
-    String elosztoHelye = 'Nincs megadva';
-    final elosztoElem = _mindenAdat.cast<BerendezesAdat?>().firstWhere(
-      (e) => e?.kod.trim().toLowerCase() == elosztoNev.toLowerCase(),
-      orElse: () => null,
-    );
-
-    if (elosztoElem != null && elosztoElem.helyszin.isNotEmpty) {
-      elosztoHelye = elosztoElem.helyszin;
-    } else if (leagazasok.isNotEmpty) {
-      elosztoHelye = leagazasok.first.elosztoHelye;
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1507,10 +1477,4 @@ class _KeresoPanelState extends State<KeresoPanel> {
       ],
     );
   }
-}
-
-class _ElosztoInfo {
-  final String hely;
-  final int verzio;
-  _ElosztoInfo(this.hely, this.verzio);
 }
