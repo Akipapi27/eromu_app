@@ -1309,8 +1309,8 @@ class _KeresoPanelState extends State<KeresoPanel> {
     String elosztoHelye = _keresHelyszin(elosztoNev);
     if (elosztoHelye == 'Nincs megadva' && leagazasok.isNotEmpty) {
       for (var l in leagazasok) {
-        if (l.helyszin.isNotEmpty) {
-          elosztoHelye = l.helyszin;
+        if (l.helyszin.trim().isNotEmpty) {
+          elosztoHelye = l.helyszin.trim();
           break;
         }
       }
