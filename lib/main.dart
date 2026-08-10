@@ -1296,15 +1296,27 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
   Widget _buildElosztoAdatlapView() {
     final elosztoNev = _kivalasztottElosztoNev!;
-    final leagazasok = _mindenAdat
-        .where(
-          (e) => e.elosztoNev.trim().toLowerCase() == elosztoNev.toLowerCase(),
-        )
-        .toList();
+    final tisztaEloszto = elosztoNev.trim().toLowerCase();
 
-    // Elosztó helyének meghatározása a fenti okos keresővel + tartalékkal
-    String elosztoHelye = _keresHelyszin(elosztoNev);
-    if (elosztoHelye == 'Nincs megadva' && leagazasok.isNotEmpty) {
+    // Elosztó helyének közvetlen, hibamentes meghatározása
+    String elosztoHelye = 'Nincs megadva';
+
+    try {
+      // 1. Megkeressük azt a berendezést, aminek a kódja megegyezik az elosztó nevével (pl. 6DS)
+      final sajatBerendezes = _mindenAdat.firstWhere(
+        (e) => e.kod.trim().toLowerCase() == tisztaEloszto,
+      );
+      if (sajatBerendezes.helyszin.trim().isNotEmpty) {
+        elosztoHelye = sajatBerendezes.helyszin.trim();
+      } else if (sajatBerendezes.elosztoHelye.trim().isNotEmpty) {
+        elosztoHelye = sajatBerendezes.elosztoHelye.trim();
+      }
+    } catch (_) {
+      // 2. Ha nincs saját sora, megnézzük a benne lévő leágazásokat
+      final leagazasok = _mindenAdat
+          .where((e) => e.elosztoNev.trim().toLowerCase() == tisztaEloszto)
+          .toList();
+
       for (var l in leagazasok) {
         if (l.helyszin.trim().isNotEmpty) {
           elosztoHelye = l.helyszin.trim();
@@ -1312,6 +1324,10 @@ class _KeresoPanelState extends State<KeresoPanel> {
         }
       }
     }
+
+    final leagazasok = _mindenAdat
+        .where((e) => e.elosztoNev.trim().toLowerCase() == tisztaEloszto)
+        .toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
