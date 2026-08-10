@@ -115,7 +115,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
   }
 
   String _keresHelyszin(String kod) {
-    if (kod.isEmpty) return 'Nincs megadva';
+    if (kod.trim().isEmpty) return 'Nincs megadva';
     final tisztaKeresett = kod.trim().toLowerCase();
 
     // 1. Pontos kód egyezés
@@ -123,18 +123,22 @@ class _KeresoPanelState extends State<KeresoPanel> {
       (e) => e.kod.trim().toLowerCase() == tisztaKeresett,
     );
     for (var item in talalat) {
-      if (item.helyszin.isNotEmpty) {
-        return item.helyszin;
+      if (item.helyszin.trim().isNotEmpty) {
+        return item.helyszin.trim();
+      }
+      // Ha a helyszín üres, de az 'elosztoHelye' ki van töltve, használjuk azt
+      if (item.elosztoHelye.trim().isNotEmpty) {
+        return item.elosztoHelye.trim();
       }
     }
 
     // 2. Megnevezés alapú keresés
-    talalat = _mindenAdat.where(
+    var megnevezesTalalat = _mindenAdat.where(
       (e) => e.megnevezes.trim().toLowerCase().contains(tisztaKeresett),
     );
-    for (var item in talalat) {
-      if (item.helyszin.isNotEmpty) {
-        return item.helyszin;
+    for (var item in megnevezesTalalat) {
+      if (item.helyszin.trim().isNotEmpty) {
+        return item.helyszin.trim();
       }
     }
 
@@ -143,8 +147,8 @@ class _KeresoPanelState extends State<KeresoPanel> {
       (e) => e.elosztoNev.trim().toLowerCase() == tisztaKeresett,
     );
     for (var item in leagazasok) {
-      if (item.helyszin.isNotEmpty) {
-        return item.helyszin;
+      if (item.helyszin.trim().isNotEmpty) {
+        return item.helyszin.trim();
       }
     }
 
@@ -1409,7 +1413,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Elosztó fizikai helye: ${_keresHelyszin(elosztoNev)}',
+                  'Elosztó fizikai helye: $elosztoHelye',
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
