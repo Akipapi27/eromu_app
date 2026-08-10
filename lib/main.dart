@@ -118,38 +118,37 @@ class _KeresoPanelState extends State<KeresoPanel> {
     if (kod.trim().isEmpty) return 'Nincs megadva';
     final tisztaKeresett = kod.trim().toLowerCase();
 
-    // 1. Pontos kód egyezés keresése (pl. ha a 6DS szerepel külön rekordként)
-    for (var item in _mindenAdat) {
-      if (item.kod.trim().toLowerCase() == tisztaKeresett) {
-        if (item.helyszin.trim().isNotEmpty) {
-          return item.helyszin.trim();
-        }
-        if (item.elosztoHelye.trim().isNotEmpty) {
-          return item.elosztoHelye.trim();
-        }
+    var talalat = _mindenAdat.where(
+      (e) => e.kod.trim().toLowerCase() == tisztaKeresett,
+    );
+    for (var item in talalat) {
+      if (item.helyszin.trim().isNotEmpty) {
+        return item.helyszin.trim();
+      }
+      if (item.elosztoHelye.trim().isNotEmpty) {
+        return item.elosztoHelye.trim();
       }
     }
 
-    // 2. Tartalék: Nézzük meg azokat az elemeket, amelyek ebből az elosztóból kapnak táplálást (elosztoNev alapján)
-    for (var item in _mindenAdat) {
-      if (item.elosztoNev.trim().toLowerCase() == tisztaKeresett) {
-        if (item.helyszin.trim().isNotEmpty) {
-          return item.helyszin.trim();
-        }
+    var megnevezesTalalat = _mindenAdat.where(
+      (e) => e.megnevezes.trim().toLowerCase().contains(tisztaKeresett),
+    );
+    for (var item in megnevezesTalalat) {
+      if (item.helyszin.trim().isNotEmpty) {
+        return item.helyszin.trim();
       }
     }
 
-    // 3. Megnevezés alapú keresés
-    for (var item in _mindenAdat) {
-      if (item.megnevezes.trim().toLowerCase().contains(tisztaKeresett)) {
-        if (item.helyszin.trim().isNotEmpty) {
-          return item.helyszin.trim();
-        }
+    final leagazasok = _mindenAdat.where(
+      (e) => e.elosztoNev.trim().toLowerCase() == tisztaKeresett,
+    );
+    for (var item in leagazasok) {
+      if (item.helyszin.trim().isNotEmpty) {
+        return item.helyszin.trim();
       }
     }
 
-    // Ha még így sincs meg, jelezzük pontosan, mit keresett
-    return 'Nincs megadva ($kod)';
+    return 'Nincs megadva';
   }
 
   String _getCacheBuster() {
@@ -273,7 +272,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
       return;
     }
 
-    // Gyűjtsük össze az elosztókat a kod ÉS az elosztoNev mezőből is!
     final egyediElosztok = <String>{};
     for (var e in _mindenAdat) {
       if (e.kod.trim().isNotEmpty) egyediElosztok.add(e.kod.trim());
@@ -335,7 +333,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final elosztoNev = item.elosztoNev.trim().toUpperCase();
     final leagazasNev = item.leagazasJel.trim().toUpperCase();
 
-    // 1. Berendezés ellenőrzése
     _elerhetoKepekKeresese(kodNev).then((kepek) {
       if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
         setState(() {
@@ -345,7 +342,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
       }
     });
 
-    // 2. Elosztó ellenőrzése
     _elerhetoKepekKeresese(elosztoNev).then((kepek) {
       if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
         setState(() {
@@ -355,7 +351,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
       }
     });
 
-    // 3. Leágazás ellenőrzése
     if (leagazasNev.isNotEmpty) {
       _elerhetoKepekKeresese(leagazasNev).then((kepek) {
         if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
@@ -426,7 +421,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final buster = _getCacheBuster();
     final alapMappaUrl = Uri.base.resolve('assets/').toString();
 
-    // Alap kép keresése (pl. 6DS01.jpg)
     final elsoTalalatUrl = await _keresElerhetoKepet(
       alapMappaUrl,
       tisztaAlapNev,
@@ -435,7 +429,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
       talalatok.add('$elsoTalalatUrl?v=$buster');
     }
 
-    // Sorszámozott képek keresése (pl. 6DS01-1.jpg ... 6DS01-9.jpg)
     for (int i = 1; i <= 9; i++) {
       final sorszamosUrl = await _keresElerhetoKepet(
         alapMappaUrl,
@@ -1298,11 +1291,9 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final elosztoNev = _kivalasztottElosztoNev!;
     final tisztaEloszto = elosztoNev.trim().toLowerCase();
 
-    // Elosztó helyének közvetlen, hibamentes meghatározása
     String elosztoHelye = 'Nincs megadva';
 
     try {
-      // 1. Megkeressük azt a berendezést, aminek a kódja megegyezik az elosztó nevével (pl. 6DS)
       final sajatBerendezes = _mindenAdat.firstWhere(
         (e) => e.kod.trim().toLowerCase() == tisztaEloszto,
       );
@@ -1312,12 +1303,11 @@ class _KeresoPanelState extends State<KeresoPanel> {
         elosztoHelye = sajatBerendezes.elosztoHelye.trim();
       }
     } catch (_) {
-      // 2. Ha nincs saját sora, megnézzük a benne lévő leágazásokat
-      final leagazasok = _mindenAdat
+      final leagazasokT = _mindenAdat
           .where((e) => e.elosztoNev.trim().toLowerCase() == tisztaEloszto)
           .toList();
 
-      for (var l in leagazasok) {
+      for (var l in leagazasokT) {
         if (l.helyszin.trim().isNotEmpty) {
           elosztoHelye = l.helyszin.trim();
           break;
@@ -1328,6 +1318,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final leagazasok = _mindenAdat
         .where((e) => e.elosztoNev.trim().toLowerCase() == tisztaEloszto)
         .toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
