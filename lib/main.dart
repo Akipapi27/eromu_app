@@ -1288,36 +1288,24 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final elosztoNev = _kivalasztottElosztoNev!;
     final tisztaEloszto = elosztoNev.trim().toUpperCase();
 
-    // --- KÉNYELMETLEN ÉS BOMBABIZTOS HELYSZÍN KERESÉS ---
-    String elosztoHelye = 'Nincs megadva';
+    // --- BOMBABIZTOS, KÉNYSZERÍTETT KERESÉS ---
+    String elosztoHelye = 'HIBA: Nem találom a 6DS adatait';
 
-    // 1. Megkeressük, van-e olyan elem, aminek a KÓDJA megegyezik az elosztó nevével (pl. 6DS)
     for (var item in _mindenAdat) {
-      if (item.kod.trim().toUpperCase() == tisztaEloszto) {
+      // Itt debugoljuk: megnézzük, mi van a JSON-ban valójában
+      final kod = item.kod.trim().toUpperCase();
+
+      if (kod == tisztaEloszto) {
+        // Ha megtaláltuk a kódot, nézzük meg mi van benne
         if (item.helyszin.trim().isNotEmpty) {
           elosztoHelye = item.helyszin.trim();
-          break;
-        }
-        if (item.elosztoHelye.trim().isNotEmpty) {
+        } else if (item.elosztoHelye.trim().isNotEmpty) {
           elosztoHelye = item.elosztoHelye.trim();
-          break;
+        } else {
+          elosztoHelye =
+              'A JSON szerint a helyszin és az elosztoHelye is üres!';
         }
-      }
-    }
-
-    // 2. Ha az 1-es pont nem talált semmit, megnézzük a benne lévő leágazások adatait is
-    if (elosztoHelye == 'Nincs megadva') {
-      for (var item in _mindenAdat) {
-        if (item.elosztoNev.trim().toUpperCase() == tisztaEloszto) {
-          if (item.helyszin.trim().isNotEmpty) {
-            elosztoHelye = item.helyszin.trim();
-            break;
-          }
-          if (item.elosztoHelye.trim().isNotEmpty) {
-            elosztoHelye = item.elosztoHelye.trim();
-            break;
-          }
-        }
+        break; // Megvan a 6DS, nem keresünk tovább
       }
     }
 
