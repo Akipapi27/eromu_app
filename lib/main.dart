@@ -118,34 +118,31 @@ class _KeresoPanelState extends State<KeresoPanel> {
     if (kod.trim().isEmpty) return 'Nincs megadva';
     final tisztaKeresett = kod.trim().toLowerCase();
 
+    // 1. Keresés közvetlenül a kód alapján (ha az elosztó saját maga is szerepel berendezésként)
     var talalat = _mindenAdat.where(
       (e) => e.kod.trim().toLowerCase() == tisztaKeresett,
     );
     for (var item in talalat) {
-      if (item.helyszin.trim().isNotEmpty) {
-        return item.helyszin.trim();
-      }
-      if (item.elosztoHelye.trim().isNotEmpty) {
-        return item.elosztoHelye.trim();
-      }
+      if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
+      if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
     }
 
+    // 2. Keresés az elosztóhoz tartozó leágazások között (ha van megadva helyszín vagy elosztóhely)
+    var leagazasok = _mindenAdat.where(
+      (e) => e.elosztoNev.trim().toLowerCase() == tisztaKeresett,
+    );
+    for (var item in leagazasok) {
+      if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
+      if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
+    }
+
+    // 3. Név szerinti keresés tartalmi egyezéssel
     var megnevezesTalalat = _mindenAdat.where(
       (e) => e.megnevezes.trim().toLowerCase().contains(tisztaKeresett),
     );
     for (var item in megnevezesTalalat) {
-      if (item.helyszin.trim().isNotEmpty) {
-        return item.helyszin.trim();
-      }
-    }
-
-    final leagazasok = _mindenAdat.where(
-      (e) => e.elosztoNev.trim().toLowerCase() == tisztaKeresett,
-    );
-    for (var item in leagazasok) {
-      if (item.helyszin.trim().isNotEmpty) {
-        return item.helyszin.trim();
-      }
+      if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
+      if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
     }
 
     return 'Nincs megadva';
@@ -1308,12 +1305,16 @@ class _KeresoPanelState extends State<KeresoPanel> {
       }
     }
 
-    // 2. Ha az 1-es pont nem talált semmit, megnézzük a benne lévő leágazásokat
+    // 2. Ha az 1-es pont nem talált semmit, megnézzük a benne lévő leágazások adatait is
     if (elosztoHelye == 'Nincs megadva') {
       for (var item in _mindenAdat) {
         if (item.elosztoNev.trim().toUpperCase() == tisztaEloszto) {
           if (item.helyszin.trim().isNotEmpty) {
             elosztoHelye = item.helyszin.trim();
+            break;
+          }
+          if (item.elosztoHelye.trim().isNotEmpty) {
+            elosztoHelye = item.elosztoHelye.trim();
             break;
           }
         }
