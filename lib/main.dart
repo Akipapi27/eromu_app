@@ -255,7 +255,10 @@ class _KeresoPanelState extends State<KeresoPanel> {
     setState(() {
       _szurtBerendezesLista = _mindenAdat.where((item) {
         return item.kod.toLowerCase().contains(szo) ||
-            item.megnevezes.toLowerCase().contains(szo);
+            item.megnevezes.toLowerCase().contains(szo) ||
+            item.elosztoNev.toLowerCase().contains(szo) ||
+            item.leagazasJel.toLowerCase().contains(szo) ||
+            item.helyszin.toLowerCase().contains(szo);
       }).toList();
     });
   }
