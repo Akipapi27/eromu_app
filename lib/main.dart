@@ -1289,34 +1289,39 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
   Widget _buildElosztoAdatlapView() {
     final elosztoNev = _kivalasztottElosztoNev!;
-    final tisztaEloszto = elosztoNev.trim().toLowerCase();
+    final tisztaEloszto = elosztoNev.trim().toUpperCase();
 
+    // --- KÉNYELMETLEN ÉS BOMBABIZTOS HELYSZÍN KERESÉS ---
     String elosztoHelye = 'Nincs megadva';
 
-    try {
-      final sajatBerendezes = _mindenAdat.firstWhere(
-        (e) => e.kod.trim().toLowerCase() == tisztaEloszto,
-      );
-      if (sajatBerendezes.helyszin.trim().isNotEmpty) {
-        elosztoHelye = sajatBerendezes.helyszin.trim();
-      } else if (sajatBerendezes.elosztoHelye.trim().isNotEmpty) {
-        elosztoHelye = sajatBerendezes.elosztoHelye.trim();
-      }
-    } catch (_) {
-      final leagazasokT = _mindenAdat
-          .where((e) => e.elosztoNev.trim().toLowerCase() == tisztaEloszto)
-          .toList();
-
-      for (var l in leagazasokT) {
-        if (l.helyszin.trim().isNotEmpty) {
-          elosztoHelye = l.helyszin.trim();
+    // 1. Megkeressük, van-e olyan elem, aminek a KÓDJA megegyezik az elosztó nevével (pl. 6DS)
+    for (var item in _mindenAdat) {
+      if (item.kod.trim().toUpperCase() == tisztaEloszto) {
+        if (item.helyszin.trim().isNotEmpty) {
+          elosztoHelye = item.helyszin.trim();
+          break;
+        }
+        if (item.elosztoHelye.trim().isNotEmpty) {
+          elosztoHelye = item.elosztoHelye.trim();
           break;
         }
       }
     }
 
+    // 2. Ha az 1-es pont nem talált semmit, megnézzük a benne lévő leágazásokat
+    if (elosztoHelye == 'Nincs megadva') {
+      for (var item in _mindenAdat) {
+        if (item.elosztoNev.trim().toUpperCase() == tisztaEloszto) {
+          if (item.helyszin.trim().isNotEmpty) {
+            elosztoHelye = item.helyszin.trim();
+            break;
+          }
+        }
+      }
+    }
+
     final leagazasok = _mindenAdat
-        .where((e) => e.elosztoNev.trim().toLowerCase() == tisztaEloszto)
+        .where((e) => e.elosztoNev.trim().toUpperCase() == tisztaEloszto)
         .toList();
 
     return Column(
