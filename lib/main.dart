@@ -118,41 +118,38 @@ class _KeresoPanelState extends State<KeresoPanel> {
     if (kod.trim().isEmpty) return 'Nincs megadva';
     final tisztaKeresett = kod.trim().toLowerCase();
 
-    // 1. Pontos kód egyezés
-    var talalat = _mindenAdat.where(
-      (e) => e.kod.trim().toLowerCase() == tisztaKeresett,
-    );
-    for (var item in talalat) {
-      if (item.helyszin.trim().isNotEmpty) {
-        return item.helyszin.trim();
-      }
-      // Ha a helyszín üres, de az 'elosztoHelye' ki van töltve, használjuk azt
-      if (item.elosztoHelye.trim().isNotEmpty) {
-        return item.elosztoHelye.trim();
+    // 1. Pontos kód egyezés keresése (pl. ha a 6DS szerepel külön rekordként)
+    for (var item in _mindenAdat) {
+      if (item.kod.trim().toLowerCase() == tisztaKeresett) {
+        if (item.helyszin.trim().isNotEmpty) {
+          return item.helyszin.trim();
+        }
+        if (item.elosztoHelye.trim().isNotEmpty) {
+          return item.elosztoHelye.trim();
+        }
       }
     }
 
-    // 2. Megnevezés alapú keresés
-    var megnevezesTalalat = _mindenAdat.where(
-      (e) => e.megnevezes.trim().toLowerCase().contains(tisztaKeresett),
-    );
-    for (var item in megnevezesTalalat) {
-      if (item.helyszin.trim().isNotEmpty) {
-        return item.helyszin.trim();
+    // 2. Tartalék: Nézzük meg azokat az elemeket, amelyek ebből az elosztóból kapnak táplálást (elosztoNev alapján)
+    for (var item in _mindenAdat) {
+      if (item.elosztoNev.trim().toLowerCase() == tisztaKeresett) {
+        if (item.helyszin.trim().isNotEmpty) {
+          return item.helyszin.trim();
+        }
       }
     }
 
-    // 3. TARTALÉK: Ha elosztóként keresik, nézzük meg a benne lévő leágazások helyszínét is!
-    final leagazasok = _mindenAdat.where(
-      (e) => e.elosztoNev.trim().toLowerCase() == tisztaKeresett,
-    );
-    for (var item in leagazasok) {
-      if (item.helyszin.trim().isNotEmpty) {
-        return item.helyszin.trim();
+    // 3. Megnevezés alapú keresés
+    for (var item in _mindenAdat) {
+      if (item.megnevezes.trim().toLowerCase().contains(tisztaKeresett)) {
+        if (item.helyszin.trim().isNotEmpty) {
+          return item.helyszin.trim();
+        }
       }
     }
 
-    return 'Nincs megadva';
+    // Ha még így sincs meg, jelezzük pontosan, mit keresett
+    return 'Nincs megadva ($kod)';
   }
 
   String _getCacheBuster() {
