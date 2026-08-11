@@ -15,64 +15,82 @@ def frissites_es_masolas():
         adatok = json.load(f)
 
     cel_prefix = input("Add meg a keresett elosztó/berendezés prefixét (pl. 6DA): ").strip().upper()
-    if not cel_prefix:
-        print("Üres értéket adtál meg, kilépés.")
+    if not cel_prefix or len(cel_prefix) < 2:
+        print("HIBA: Túl rövid vagy üres prefixet adtál meg (legalább 2 karakter kell).")
         return
 
-    # 1. Megkeressük, van-e már olyan elem, aminek a KÓDJA ezzel kezdődik, és van benne helyszín
-    cel_helyszin = ""
+    # 1. Megkeressük, van-e már valamilyen helyszín a prefixhez
+    aktualis_helyszin = ""
     for elem in adatok:
         kod = str(elem.get('kod', '')).strip().upper()
         if kod.startswith(cel_prefix):
             hely = elem.get('helyszin', '').strip()
             if hely:
-                cel_helyszin = hely
-                print(f"Találtam egyező kódot ('{kod}'), kinyert helyszín: '{cel_helyszin}'")
+                aktualis_helyszin = hely
                 break
 
-    # Ha nincs automatikus helyszín, megszámoljuk, mennyi elem kapcsolódik ehhez a prefixhez
-    if not cel_helyszin:
-        kapcsolodo_db = sum(
-            1 for elem in adatok 
-            if str(elem.get('kod', '')).strip().upper().startswith(cel_prefix)
-            or str(elem.get('elosztoNev', '')).strip().upper().startswith(cel_prefix) 
-            or str(elem.get('leagazasJel', '')).strip().upper().startswith(cel_prefix)
-        )
-        
-        if kapcsolodo_db > 0:
-            print(f"Figyelem: A(z) '{cel_prefix}*' prefix-szel kezdődő elemekhez még nincs helyszín rendelve ({kapcsolodo_db} db találat).")
-            cel_helyszin = input(f"Kérlek, add meg a(z) '{cel_prefix}*' csoport helyszínét: ").strip()
-        else:
-            print(f"HIBA: Az adatbázisban semmi sem kezdődik ezzel: '{cel_prefix}'!")
-            return
+    # 2. Mindenképpen kiírjuk, mit találtunk, és felajánljuk a módosítást
+    print("\n" + "-"*50)
+    if aktualis_helyszin:
+        print(f"A(z) '{cel_prefix}' prefixhez jelenleg rögzített helyszín: '{aktualis_helyszin}'")
+    else:
+        print(f"A(z) '{cel_prefix}' prefixhez még NINCS kitöltve helyszín.")
+    print("-"*50)
+
+    uj_helyszin = input("Add meg a helyszínt (ha jó a fenti és nem változtatod, csak nyomj Entert): ").strip()
+    
+    if uj_helyszin:
+        cel_helyszin = uj_helyszin
+        print(f"-> Új helyszín érvényesítve: '{cel_helyszin}'")
+    else:
+        cel_helyszin = aktualis_helyszin
 
     if not cel_helyszin:
-        print("Nem adtál meg helyszínt, a folyamat megszakítva.")
+        print("HIBA: Nincs érvényes helyszín megadva, a folyamat megszakítva.")
         return
 
-    print(f"Alkalmazott helyszín: '{cel_helyszin}'")
-
-    # 2. Frissítjük mindazokat, amelyek ezzel a prefix-szel kezdődnek (kod, elosztoNev vagy leagazasJel)
-    modositott_db = 0
+    # 3. Előzetes szűrés, hogy lássuk, miket érint
+    erintett_elemek = []
     for elem in adatok:
         kod = str(elem.get('kod', '')).strip().upper()
         eloszto = str(elem.get('elosztoNev', '')).strip().upper()
         leagazas = str(elem.get('leagazasJel', '')).strip().upper()
         
         if kod.startswith(cel_prefix) or eloszto.startswith(cel_prefix) or leagazas.startswith(cel_prefix):
-            # Ha a saját kódja is ezzel kezdődik és üres a helyszíne, oda is beírjuk
-            if kod.startswith(cel_prefix) and not elem.get('helyszin', '').strip():
-                elem['helyszin'] = cel_helyszin
-            elem['elosztoHelye'] = cel_helyszin
-            modositott_db += 1
+            erintett_elemek.append(elem)
 
-    # 3. Mentés a Downloads mappába
+    if not erintett_elemek:
+        print(f"HIBA: Az adatbázisban semmi sem kezdődik ezzel: '{cel_prefix}'!")
+        return
+
+    print("\n" + "="*50)
+    print(f"BIZTONSÁGI ELLENŐRZÉS:")
+    print(f"-> Keresett prefix: '{cel_prefix}'")
+    print(f"-> Alkalmazott helyszín: '{cel_helyszin}'")
+    print(f"-> Érintett rekordok száma: {len(erintett_elemek)} db")
+    print("="*50)
+
+    joovahagyas = input("Biztosan végrehajtod a módosítást? (i / n): ").strip().lower()
+    if joovahagyas not in ['i', 'igen', 'y', 'yes']:
+        print("A folyamat a felhasználó által megszakítva. Nem történt változtatás.")
+        return
+
+    # 4. Végrehajtás
+    modositott_db = 0
+    for elem in erintett_elemek:
+        kod = str(elem.get('kod', '')).strip().upper()
+        if kod.startswith(cel_prefix):
+            elem['helyszin'] = cel_helyszin
+        elem['elosztoHelye'] = cel_helyszin
+        modositott_db += 1
+
+    # 5. Mentés a Downloads mappába
     with open(downloads_fajl, 'w', encoding='utf-8') as f:
         json.dump(adatok, f, ensure_ascii=False, indent=4)
         
-    print(f"Siker! {modositott_db} darab rekord frissítve a Downloads-ban a(z) '{cel_prefix}*' prefix alapján.")
+    print(f"Siker! {modositott_db} darab rekord frissítve a Downloads-ban.")
 
-    # 4. Automatikus átmásolás a projekt assets mappájába
+    # 6. Automatikus átmásolás a projekt assets mappájába
     if not os.path.exists(projekt_mappa):
         os.makedirs(projekt_mappa, exist_ok=True)
 
