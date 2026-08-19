@@ -2,7 +2,7 @@ import os
 import shutil
 import json
 import re
-from PIL import Image
+from PIL import Image, ImageOps
 
 def elokeszit():
     home = os.path.expanduser('~')
@@ -56,6 +56,9 @@ def elokeszit():
                 
                 # Kép megnyitása és feldolgozása Pillow-val
                 with Image.open(source_path) as img:
+                    # EXIF orientáció korrekció (megakadályozza a képek elforgatását)
+                    img = ImageOps.exif_transpose(img) or img
+
                     # Ha a kép átlátszó (pl. PNG), teszünk alá egy fehér hátteret, 
                     # mert a JPEG formátum nem támogatja az átlátszóságot (különben fekete lenne).
                     if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
