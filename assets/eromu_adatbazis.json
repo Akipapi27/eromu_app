@@ -13368,7 +13368,7 @@
     "verzio": 20260731
   },
   {
-    "kod": "6DP_6",
+    "kod": "6DP_14",
     "megnevezes": "6DP jelű alelo. betáp.",
     "helyszin": "Gépház, 0m, K-i fal, VI. kondenzátor mellett.",
     "elosztoNev": "6CA",
@@ -13680,7 +13680,7 @@
     "verzio": 20260731
   },
   {
-    "kod": "6DP_5",
+    "kod": "6DP_12",
     "megnevezes": "6DP jelű alelo.betáp.",
     "helyszin": "Gépház, 0m, K-i fal, VI. kondenzátor mellett.",
     "elosztoNev": "6CB",
@@ -15852,7 +15852,7 @@
     "verzio": 20260731
   },
   {
-    "kod": "6DP_14",
+    "kod": "6DP_01",
     "megnevezes": "Áttáp.6DP elo.-ba",
     "helyszin": "Gépház, 0m, K-i fal, VI. kondenzátor mellett.",
     "elosztoNev": "6DR",
@@ -16008,7 +16008,7 @@
     "verzio": 20260731
   },
   {
-    "kod": "6DR_8",
+    "kod": "6DR_08",
     "megnevezes": "Áttáp.a 6DR elo.-ba",
     "helyszin": "Gépház, 7,5m, VI. generátor mellett.",
     "elosztoNev": "6DP",
@@ -16020,9 +16020,9 @@
     "verzio": 20260731
   },
   {
-    "kod": "5DP_MELLETT",
+    "kod": "TARTAL_K_T_PTART_LY_V",
     "megnevezes": "Tart.tápt.őv.betáp",
-    "helyszin": "",
+    "helyszin": "5DP mellett",
     "elosztoNev": "6DP",
     "leagazasJel": "6DP_02",
     "elosztoHelye": "Gépház, 0m, K-i fal, VI. kondenzátor mellett.",
@@ -16044,8 +16044,8 @@
     "verzio": 20260731
   },
   {
-    "kod": "6SC01D001",
-    "megnevezes": "Turb.csap.sziv.",
+    "kod": "6RT01S203",
+    "megnevezes": "Víztelenítés (ind. red.)",
     "helyszin": "",
     "elosztoNev": "6DP",
     "leagazasJel": "6DP_04",
@@ -16056,8 +16056,8 @@
     "verzio": 20260731
   },
   {
-    "kod": "6RX11D001",
-    "megnevezes": "Kondenzvíz tartály sziv.",
+    "kod": "6SC01D001",
+    "megnevezes": "Turbina csapágyolaj szivattyú",
     "helyszin": "",
     "elosztoNev": "6DP",
     "leagazasJel": "6DP_05",
@@ -16068,8 +16068,8 @@
     "verzio": 20260731
   },
   {
-    "kod": "6RX11D002",
-    "megnevezes": "Kondenzvíz tartály sziv.",
+    "kod": "6RT01S205",
+    "megnevezes": "Víztelenítés (vasfogó)",
     "helyszin": "",
     "elosztoNev": "6DP",
     "leagazasJel": "6DP_06",
@@ -16080,11 +16080,11 @@
     "verzio": 20260731
   },
   {
-    "kod": "6CB3_1",
+    "kod": "6CB_3_1",
     "megnevezes": "Betáp.a 6CB elo.-ból",
     "helyszin": "VI. 0,4kV-os főelosztóban.",
     "elosztoNev": "6DP",
-    "leagazasJel": "6DP_09",
+    "leagazasJel": "6DP_12",
     "elosztoHelye": "Gépház, 0m, K-i fal, VI. kondenzátor mellett.",
     "berendezesKep": null,
     "elosztoKep": null,
@@ -16092,11 +16092,11 @@
     "verzio": 20260731
   },
   {
-    "kod": "",
+    "kod": "WOMA_CSATLAKOZ",
     "megnevezes": "WOMA csatlakozó",
     "helyszin": "",
     "elosztoNev": "6DP",
-    "leagazasJel": "6DP_10",
+    "leagazasJel": "6DP_13",
     "elosztoHelye": "Gépház, 0m, K-i fal, VI. kondenzátor mellett.",
     "berendezesKep": null,
     "elosztoKep": null,
@@ -16104,11 +16104,11 @@
     "verzio": 20260731
   },
   {
-    "kod": "6CA3_1",
+    "kod": "6CA_3_1",
     "megnevezes": "Betáp.a 6CA elo.-ból",
     "helyszin": "VI. 0,4kV-os főelosztóban",
     "elosztoNev": "6DP",
-    "leagazasJel": "6DP_11",
+    "leagazasJel": "6DP_14",
     "elosztoHelye": "Gépház, 0m, K-i fal, VI. kondenzátor mellett.",
     "berendezesKep": null,
     "elosztoKep": null,
@@ -16120,7 +16120,7 @@
     "megnevezes": "Tart.táptartály sziv.",
     "helyszin": "",
     "elosztoNev": "6DP",
-    "leagazasJel": "6DP_12",
+    "leagazasJel": "6DP_16",
     "elosztoHelye": "Gépház, 0m, K-i fal, VI. kondenzátor mellett.",
     "berendezesKep": null,
     "elosztoKep": null,
@@ -16132,7 +16132,7 @@
     "megnevezes": "Turb.tengely forgató",
     "helyszin": "",
     "elosztoNev": "6DP",
-    "leagazasJel": "6DP_13",
+    "leagazasJel": "6DP_18",
     "elosztoHelye": "Gépház, 0m, K-i fal, VI. kondenzátor mellett.",
     "berendezesKep": null,
     "elosztoKep": null,
@@ -16144,7 +16144,7 @@
     "megnevezes": "Átemelő sziv.",
     "helyszin": "",
     "elosztoNev": "6DP",
-    "leagazasJel": "6DP_14",
+    "leagazasJel": "6DP_20",
     "elosztoHelye": "Gépház, 0m, K-i fal, VI. kondenzátor mellett.",
     "berendezesKep": null,
     "elosztoKep": null,
@@ -16156,7 +16156,7 @@
     "megnevezes": "Áttáp.a 6DN elo.-ba",
     "helyszin": "Gépház, 0m, a záróolaj állvány mellett.",
     "elosztoNev": "6DP",
-    "leagazasJel": "6DP_11",
+    "leagazasJel": "6DP_22",
     "elosztoHelye": "Gépház, 0m, a záróolaj állvány mellett.",
     "berendezesKep": null,
     "elosztoKep": null,
@@ -16164,7 +16164,7 @@
     "verzio": 20260731
   },
   {
-    "kod": "6DP11",
+    "kod": "6DP_22",
     "megnevezes": "Betáp.a 6DP elo.-ból",
     "helyszin": "Gépház, 0m, K-i fal, VI. kondenzátor mellett.",
     "elosztoNev": "6DN",
