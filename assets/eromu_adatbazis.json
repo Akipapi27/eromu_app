@@ -13644,7 +13644,7 @@
     "verzio": 20260731
   },
   {
-    "kod": "6DM_9",
+    "kod": "6DM_09",
     "megnevezes": "6DM jelű alelo.betáp",
     "helyszin": "",
     "elosztoNev": "6CB",
@@ -16284,6 +16284,18 @@
     "verzio": 20260731
   },
   {
+    "kod": "",
+    "megnevezes": "10. kazán mintavételi állvány betáp",
+    "helyszin": "",
+    "elosztoNev": "6DM",
+    "leagazasJel": "6DM_02",
+    "elosztoHelye": "",
+    "berendezesKep": null,
+    "elosztoKep": null,
+    "feljegyzes": null,
+    "verzio": 20260731
+  },
+  {
     "kod": "6RF01S201",
     "megnevezes": "E5 gőz tz.",
     "helyszin": "",
@@ -16344,7 +16356,7 @@
     "verzio": 20260731
   },
   {
-    "kod": "6CB1_1",
+    "kod": "6CB_1_1",
     "megnevezes": "Betáp.a 6CB elo.-ból",
     "helyszin": "VI. 0,4kV-os főelosztóban.",
     "elosztoNev": "6DM",
@@ -16356,11 +16368,35 @@
     "verzio": 20260731
   },
   {
-    "kod": "6DL11",
+    "kod": "6DL_11",
     "megnevezes": "Áttáp.a 6DL elo.-ba",
     "helyszin": "",
     "elosztoNev": "6DM",
     "leagazasJel": "6DM_10",
+    "elosztoHelye": "",
+    "berendezesKep": null,
+    "elosztoKep": null,
+    "feljegyzes": null,
+    "verzio": 20260731
+  },
+  {
+    "kod": "6RF12S201",
+    "megnevezes": "VI. turbina E4 megcsapolás",
+    "helyszin": "",
+    "elosztoNev": "6DM",
+    "leagazasJel": "6DM_12",
+    "elosztoHelye": "",
+    "berendezesKep": null,
+    "elosztoKep": null,
+    "feljegyzes": null,
+    "verzio": 20260731
+  },
+  {
+    "kod": "0RV02S201",
+    "megnevezes": "VII. táptartály töltőszelep",
+    "helyszin": "",
+    "elosztoNev": "6DM",
+    "leagazasJel": "6DM_13",
     "elosztoHelye": "",
     "berendezesKep": null,
     "elosztoKep": null,
@@ -16488,7 +16524,7 @@
     "verzio": 20260731
   },
   {
-    "kod": "6DM10",
+    "kod": "6DM_10",
     "megnevezes": "Áttáp.a 6DM elo.-ba",
     "helyszin": "",
     "elosztoNev": "6DL",
