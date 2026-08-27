@@ -60,18 +60,6 @@
         "verzio": 0
     },
     {
-        "kod": "6ND01D005",
-        "megnevezes": "D-i kihordó csiga kenőolaj szivattyú",
-        "helyszin": "Kazánház, 7,5 m, D-i napi tartály alatt",
-        "elosztoNev": "6DC",
-        "leagazasJel": "6DC4",
-        "elosztoHelye": "Kazánház, 7,5m, a DNY-i sarokban lévő elosztó helyiségben.",
-        "berendezesKep": null,
-        "elosztoKep": null,
-        "feljegyzes": null,
-        "verzio": 0
-    },
-    {
         "kod": "6NC04S201",
         "megnevezes": "Dobürítő alap tolózár",
         "helyszin": "Kazánház , 7,5 m, 10. kazán ÉK-i sarok",
@@ -13524,7 +13512,7 @@
         "verzio": 20260731
     },
     {
-        "kod": "6DC_6",
+        "kod": "6DC_06",
         "megnevezes": "6DC jelű alelo. betáp",
         "helyszin": "Kazánház, 7,5m, a DNY-i sarokban lévő elosztó helyiségben.",
         "elosztoNev": "6CA",
@@ -14328,7 +14316,7 @@
         "verzio": 20260731
     },
     {
-        "kod": "6CA10_2",
+        "kod": "6CA_10_2",
         "megnevezes": "Betáp.a 6CA főelo.ból",
         "helyszin": "VI. 0,4kV-os főelosztóban",
         "elosztoNev": "6DC",
@@ -14340,7 +14328,7 @@
         "verzio": 20260731
     },
     {
-        "kod": "6DD_8",
+        "kod": "6DD_08",
         "megnevezes": "Áttáp.a 6DD alelo.-ba",
         "helyszin": "Kazánház, 7,5m, a DNY-i sarokban lévő elosztó helyiségben.",
         "elosztoNev": "6DC",
@@ -14390,7 +14378,7 @@
     {
         "kod": "6ND01D005",
         "megnevezes": "1.f.cs.kihordó kenőolajszív",
-        "helyszin": "",
+        "helyszin": "Kazánház, 7,5m, a D-i napitartály alatt.",
         "elosztoNev": "6DC",
         "leagazasJel": "6DC_04",
         "elosztoHelye": "Kazánház, 7,5m, a DNY-i sarokban lévő elosztó helyiségben.",
@@ -14404,20 +14392,8 @@
         "megnevezes": "1.f.cs.kihordó fűtés",
         "helyszin": "",
         "elosztoNev": "6DC",
-        "leagazasJel": "6DC_05_1",
+        "leagazasJel": "6DC_05",
         "elosztoHelye": "Kazánház, 7,5m, a DNY-i sarokban lévő elosztó helyiségben.",
-        "berendezesKep": null,
-        "elosztoKep": null,
-        "feljegyzes": null,
-        "verzio": 20260731
-    },
-    {
-        "kod": "6ND12D002",
-        "megnevezes": "1.cs.adagoló 2.h.vent.",
-        "helyszin": "",
-        "elosztoNev": "6DC",
-        "leagazasJel": "6DA_15",
-        "elosztoHelye": "Kazánház, 7,5m, DK-i sarokban a D-i falon.",
         "berendezesKep": null,
         "elosztoKep": null,
         "feljegyzes": null,
@@ -14460,7 +14436,7 @@
         "verzio": 20260731
     },
     {
-        "kod": "6CB10_2",
+        "kod": "6CB_10_2",
         "megnevezes": "Betáp.a 6CB főelo.-ból",
         "helyszin": "VI. 0,4kV-os főelosztóban.",
         "elosztoNev": "6DD",
@@ -14472,7 +14448,7 @@
         "verzio": 20260731
     },
     {
-        "kod": "6DC_8",
+        "kod": "6DC_08",
         "megnevezes": "Áttáp.a 6DC alelo.-ba",
         "helyszin": "Kazánház, 7,5m, a DNY-i sarokban lévő elosztó helyiségben.",
         "elosztoNev": "6DD",
