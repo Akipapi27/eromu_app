@@ -8436,11 +8436,35 @@
         "verzio": 20260731
     },
     {
+        "kod": "3CA_01_A",
+        "megnevezes": "Betáp a 3CA-ból.",
+        "helyszin": "",
+        "elosztoNev": "3DP",
+        "leagazasJel": "3DP_08",
+        "elosztoHelye": "Gépház, 0m, a III. generátor alatt.",
+        "berendezesKep": null,
+        "elosztoKep": null,
+        "feljegyzes": null,
+        "verzio": 20260731
+    },
+    {
         "kod": "4UN20S201",
         "megnevezes": "Füt. V. 1fk vissza",
         "helyszin": "",
         "elosztoNev": "3DP",
         "leagazasJel": "3DP_09",
+        "elosztoHelye": "Gépház, 0m, a III. generátor alatt.",
+        "berendezesKep": null,
+        "elosztoKep": null,
+        "feljegyzes": null,
+        "verzio": 20260731
+    },
+    {
+        "kod": "3CB_01_B",
+        "megnevezes": "Betáp a 3CB-ből.",
+        "helyszin": "",
+        "elosztoNev": "3DP",
+        "leagazasJel": "3DP_10",
         "elosztoHelye": "Gépház, 0m, a III. generátor alatt.",
         "berendezesKep": null,
         "elosztoKep": null,
