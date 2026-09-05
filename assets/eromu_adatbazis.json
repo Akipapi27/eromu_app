@@ -408,7 +408,7 @@
         "verzio": 20260730
     },
     {
-        "kod": "2DD_ALELOSZT_BET_PL_L_S_1",
+        "kod": "2DD_I_Betáp",
         "megnevezes": "2DD alelosztó I. Betáplálás",
         "helyszin": "Kazánház, 0m, 2DG elosztó mögött.",
         "elosztoNev": "2CA",
@@ -504,7 +504,7 @@
         "verzio": 20260730
     },
     {
-        "kod": "2DD_ALELOSZT_BET_PL_L_S_2",
+        "kod": "2DD_II_Betáp",
         "megnevezes": "2DD alelosztó II. Betáplálás",
         "helyszin": "Kazánház, 0m, 2DG elosztó mögött.",
         "elosztoNev": "2CB",
@@ -3888,7 +3888,7 @@
         "verzio": 20260730
     },
     {
-        "kod": "I_BET_PL_L_S_2DD",
+        "kod": "2DD_I_Betáp",
         "megnevezes": "I. Betáplálás 2CA-ból",
         "helyszin": "",
         "elosztoNev": "2DD",
@@ -3900,7 +3900,7 @@
         "verzio": 20260730
     },
     {
-        "kod": "II_BET_PL_L_S_2DD",
+        "kod": "2DD_II_Betáp",
         "megnevezes": "II. Betáplálás 2CB-ből",
         "helyszin": "",
         "elosztoNev": "2DD",
