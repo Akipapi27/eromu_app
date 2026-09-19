@@ -180,9 +180,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
           };
           final honap = honapok[honapNev.substring(0, 3)] ?? '01';
 
-          return DateTime.parse(
-            '${ev}-${honap}-${nap.padLeft(2, '0')}T${ido}Z',
-          );
+          return DateTime.parse('$ev-$honap-${nap.padLeft(2, '0')}T${ido}Z');
         }
       } catch (_) {}
     }
@@ -272,8 +270,9 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final egyediElosztok = <String>{};
     for (var e in _mindenAdat) {
       if (e.kod.trim().isNotEmpty) egyediElosztok.add(e.kod.trim());
-      if (e.elosztoNev.trim().isNotEmpty)
+      if (e.elosztoNev.trim().isNotEmpty) {
         egyediElosztok.add(e.elosztoNev.trim());
+      }
     }
 
     setState(() {
@@ -462,7 +461,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
   }
 
   void _galeriaMegnyitasa(
-    List<String> kepUrl_ek,
+    List<String> kepurlEk,
     String cim,
     String egyediAzonosito,
   ) {
@@ -480,13 +479,13 @@ class _KeresoPanelState extends State<KeresoPanel> {
       );
     }
 
-    regisztralKepatmero(kepUrl_ek[aktualisIndex], aktualisIndex);
+    regisztralKepatmero(kepurlEk[aktualisIndex], aktualisIndex);
 
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Bezárás',
-      barrierColor: Colors.black.withOpacity(0.85),
+      barrierColor: Colors.black.withValues(alpha: 0.85),
       pageBuilder: (context, anim1, anim2) {
         return StatefulBuilder(
           builder: (context, setModalState) {
@@ -514,7 +513,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          if (kepUrl_ek.length > 1)
+                          if (kepurlEk.length > 1)
                             Container(
                               margin: const EdgeInsets.symmetric(
                                 horizontal: 10,
@@ -528,7 +527,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                '${aktualisIndex + 1} / ${kepUrl_ek.length}',
+                                '${aktualisIndex + 1} / ${kepurlEk.length}',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -577,7 +576,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    if (kepUrl_ek.length > 1)
+                    if (kepurlEk.length > 1)
                       Padding(
                         padding: const EdgeInsets.only(
                           bottom: 20.0,
@@ -595,7 +594,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                         transformCtrl.value =
                                             Matrix4.identity();
                                         regisztralKepatmero(
-                                          kepUrl_ek[aktualisIndex],
+                                          kepurlEk[aktualisIndex],
                                           aktualisIndex,
                                         );
                                       });
@@ -609,14 +608,14 @@ class _KeresoPanelState extends State<KeresoPanel> {
                               ),
                             ),
                             ElevatedButton.icon(
-                              onPressed: aktualisIndex < kepUrl_ek.length - 1
+                              onPressed: aktualisIndex < kepurlEk.length - 1
                                   ? () {
                                       setModalState(() {
                                         aktualisIndex++;
                                         transformCtrl.value =
                                             Matrix4.identity();
                                         regisztralKepatmero(
-                                          kepUrl_ek[aktualisIndex],
+                                          kepurlEk[aktualisIndex],
                                           aktualisIndex,
                                         );
                                       });
@@ -1129,6 +1128,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Column(
@@ -1152,41 +1152,12 @@ class _KeresoPanelState extends State<KeresoPanel> {
                               ),
                               const SizedBox(width: 8),
                               if (item.leagazasJel.isNotEmpty)
-                                Tooltip(
-                                  message: _leagazasKepToltodik
-                                      ? 'Képkeresés...'
-                                      : (_vanLeagazasKep
-                                            ? 'Leágazás fotójának megtekintése'
-                                            : 'Nincs még kép feltöltve'),
-                                  child: InkWell(
-                                    onTap: _leagazasKepToltodik
-                                        ? null
-                                        : (_vanLeagazasKep
-                                              ? () => _galeriaInditasa(
-                                                  leagazasNev,
-                                                  'Leágazás: ${item.leagazasJel}',
-                                                )
-                                              : () => _nincsKepUzenet(context)),
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 4.0,
-                                        vertical: 2.0,
-                                      ),
-                                      child: Text(
-                                        '[Leágazás: ${item.leagazasJel}]',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: _vanLeagazasKep
-                                              ? Colors.blue[700]
-                                              : Colors.grey[600],
-                                          fontSize: 14,
-                                          decoration: _vanLeagazasKep
-                                              ? TextDecoration.underline
-                                              : TextDecoration.none,
-                                        ),
-                                      ),
-                                    ),
+                                Text(
+                                  '[Leágazás: ${item.leagazasJel}]',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[700],
+                                    fontSize: 14,
                                   ),
                                 ),
                             ],
@@ -1202,57 +1173,116 @@ class _KeresoPanelState extends State<KeresoPanel> {
                         ],
                       ),
                     ),
-                    Tooltip(
-                      message: _elosztoKepToltodik
-                          ? 'Képkeresés...'
-                          : (_vanElosztoKep
-                                ? 'Elosztó fotójának megtekintése'
-                                : 'Nincs még kép feltöltve'),
-                      child: ElevatedButton.icon(
-                        onPressed: _elosztoKepToltodik
-                            ? null
-                            : (_vanElosztoKep
-                                  ? () => _galeriaInditasa(
-                                      elosztoNev,
-                                      'Elosztó: ${item.elosztoNev}',
-                                    )
-                                  : () => _nincsKepUzenet(context)),
-                        icon: _elosztoKepToltodik
-                            ? const SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Icon(
-                                Icons.bolt,
-                                size: 18,
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Tooltip(
+                          message: _elosztoKepToltodik
+                              ? 'Képkeresés...'
+                              : (_vanElosztoKep
+                                    ? 'Elosztó fotójának megtekintése'
+                                    : 'Nincs még kép feltöltve'),
+                          child: ElevatedButton.icon(
+                            onPressed: _elosztoKepToltodik
+                                ? null
+                                : (_vanElosztoKep
+                                      ? () => _galeriaInditasa(
+                                          elosztoNev,
+                                          'Elosztó: ${item.elosztoNev}',
+                                        )
+                                      : () => _nincsKepUzenet(context)),
+                            icon: _elosztoKepToltodik
+                                ? const SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.bolt,
+                                    size: 18,
+                                    color: _vanElosztoKep
+                                        ? Colors.amber[900]
+                                        : Colors.grey[600],
+                                  ),
+                            label: Text(
+                              'Elosztó fotó',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
                                 color: _vanElosztoKep
                                     ? Colors.amber[900]
                                     : Colors.grey[600],
                               ),
-                        label: Text(
-                          'Elosztó fotó',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: _vanElosztoKep
-                                ? Colors.amber[900]
-                                : Colors.grey[600],
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _vanElosztoKep
+                                  ? Colors.amber[50]
+                                  : Colors.grey[200],
+                              elevation: _vanElosztoKep ? 2 : 0,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                            ),
                           ),
                         ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _vanElosztoKep
-                              ? Colors.amber[50]
-                              : Colors.grey[200],
-                          elevation: _vanElosztoKep ? 2 : 0,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 10,
+                        const SizedBox(height: 8),
+                        Tooltip(
+                          message: _leagazasKepToltodik
+                              ? 'Képkeresés...'
+                              : (_vanLeagazasKep
+                                    ? 'Leágazás fotójának megtekintése'
+                                    : 'Nincs még kép feltöltve'),
+                          child: ElevatedButton.icon(
+                            onPressed: _leagazasKepToltodik
+                                ? null
+                                : (_vanLeagazasKep
+                                      ? () => _galeriaInditasa(
+                                          leagazasNev,
+                                          'Leágazás: ${item.leagazasJel}',
+                                        )
+                                      : () => _nincsKepUzenet(context)),
+                            icon: _leagazasKepToltodik
+                                ? const SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.camera_alt_outlined,
+                                    size: 18,
+                                    color: _vanLeagazasKep
+                                        ? Colors.blue[900]
+                                        : Colors.grey[600],
+                                  ),
+                            label: Text(
+                              'Leágazás fotó',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: _vanLeagazasKep
+                                    ? Colors.blue[900]
+                                    : Colors.grey[600],
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _vanLeagazasKep
+                                  ? Colors.blue[50]
+                                  : Colors.grey[200],
+                              elevation: _vanLeagazasKep ? 2 : 0,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
@@ -1288,15 +1318,12 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final elosztoNev = _kivalasztottElosztoNev!;
     final tisztaEloszto = elosztoNev.trim().toUpperCase();
 
-    // --- BOMBABIZTOS, KÉNYSZERÍTETT KERESÉS ---
-    String elosztoHelye = 'HIBA: Nem találom a 6DS adatait';
+    String elosztoHelye = 'HIBA: Nem találom az adatokat';
 
     for (var item in _mindenAdat) {
-      // Itt debugoljuk: megnézzük, mi van a JSON-ban valójában
       final kod = item.kod.trim().toUpperCase();
 
       if (kod == tisztaEloszto) {
-        // Ha megtaláltuk a kódot, nézzük meg mi van benne
         if (item.helyszin.trim().isNotEmpty) {
           elosztoHelye = item.helyszin.trim();
         } else if (item.elosztoHelye.trim().isNotEmpty) {
@@ -1305,7 +1332,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
           elosztoHelye =
               'A JSON szerint a helyszin és az elosztoHelye is üres!';
         }
-        break; // Megvan a 6DS, nem keresünk tovább
+        break;
       }
     }
 
@@ -1439,7 +1466,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
               border: Border.all(color: Colors.grey[300]!),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 6,
                   offset: const Offset(0, 3),
                 ),
