@@ -299,7 +299,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
     setState(() {
       _szurtElosztoLista = egyediElosztok.where((e) {
-        return e.toLowerCase().contains(szo);
+        return !e.contains('_') && e.toLowerCase().contains(szo);
       }).toList();
       _szurtElosztoLista.sort();
     });
@@ -1296,7 +1296,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 ),
                 const SizedBox(height: 10),
 
-                // 2. Sor: Gombostű és utána az elosztó helye
+                // 2. Sor: Gombostű és utána közvetlenül az elosztó helye (szöveg nélkül)
                 Row(
                   children: [
                     const Text('📍 ', style: TextStyle(fontSize: 14)),
@@ -1319,7 +1319,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                         'Leágazás: ${item.leagazasJel}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Colors.grey[700],
                           fontSize: 14,
                         ),
                       ),
