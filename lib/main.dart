@@ -114,6 +114,33 @@ class _KeresoPanelState extends State<KeresoPanel> {
     _elosztoKeresoCtrl.addListener(_elosztoSzuresVegrehajtasa);
   }
 
+  Future<void> _szuperFrissites() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // 1. Service Worker regisztrációk törlése, hogy ne tartsa vissza a régi kódot
+      if (html.window.navigator.serviceWorker != null) {
+        final registrations = await html.window.navigator.serviceWorker!
+            .getRegistrations();
+        for (var reg in registrations) {
+          await reg.unregister();
+        }
+      }
+    } catch (_) {}
+
+    try {
+      // 2. Kényszerített oldal-újratöltés egyedi időbélyeggel (cache-busting),
+      // ami rákényszeríti a böngészőt, hogy a szerverről szedje le az egészet tiszta lappal.
+      final currentUrl = html.window.location.href.split('?').first;
+      html.window.location.href =
+          '$currentUrl?cb=${DateTime.now().millisecondsSinceEpoch}';
+    } catch (_) {
+      _adatbazisBetoltese();
+    }
+  }
+
   String _keresHelyszin(String kod) {
     if (kod.trim().isEmpty) return 'Nincs megadva';
     final tisztaKeresett = kod.trim().toLowerCase();
@@ -673,12 +700,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _isLoading = true;
-                    });
-                    _adatbazisBetoltese();
-                  },
+                  onPressed: _szuperFrissites,
                   icon: const Icon(Icons.refresh),
                   label: const Text('Újrapróbálkozás'),
                 ),
@@ -703,12 +725,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: () {
-              setState(() {
-                _isLoading = true;
-              });
-              _adatbazisBetoltese();
-            },
+            onPressed: _szuperFrissites,
           ),
         ],
       ),
