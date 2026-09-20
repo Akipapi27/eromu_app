@@ -1302,7 +1302,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                     const Text('📍 ', style: TextStyle(fontSize: 14)),
                     Expanded(
                       child: Text(
-                        'Elosztó helye: ${_keresHelyszin(item.elosztoNev)}',
+                        _keresHelyszin(item.elosztoNev),
                         style: TextStyle(color: Colors.grey[800], fontSize: 14),
                       ),
                     ),
@@ -1319,7 +1319,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                         'Leágazás: ${item.leagazasJel}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.grey[700],
+                          color: Colors.black,
                           fontSize: 14,
                         ),
                       ),
