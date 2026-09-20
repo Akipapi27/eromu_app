@@ -120,7 +120,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     });
 
     try {
-      // 1. Service Worker regisztrációk törlése, hogy ne tartsa vissza a régi kódot
       if (html.window.navigator.serviceWorker != null) {
         final registrations = await html.window.navigator.serviceWorker!
             .getRegistrations();
@@ -131,8 +130,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     } catch (_) {}
 
     try {
-      // 2. Kényszerített oldal-újratöltés egyedi időbélyeggel (cache-busting),
-      // ami rákényszeríti a böngészőt, hogy a szerverről szedje le az egészet tiszta lappal.
       final currentUrl = html.window.location.href.split('?').first;
       html.window.location.href =
           '$currentUrl?cb=${DateTime.now().millisecondsSinceEpoch}';
@@ -145,7 +142,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     if (kod.trim().isEmpty) return 'Nincs megadva';
     final tisztaKeresett = kod.trim().toLowerCase();
 
-    // 1. Keresés közvetlenül a kód alapján (ha az elosztó saját maga is szerepel berendezésként)
     var talalat = _mindenAdat.where(
       (e) => e.kod.trim().toLowerCase() == tisztaKeresett,
     );
@@ -154,7 +150,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
       if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
     }
 
-    // 2. Keresés az elosztóhoz tartozó leágazások között (ha van megadva helyszín vagy elosztóhely)
     var leagazasok = _mindenAdat.where(
       (e) => e.elosztoNev.trim().toLowerCase() == tisztaKeresett,
     );
@@ -163,7 +158,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
       if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
     }
 
-    // 3. Név szerinti keresés tartalmi egyezéssel
     var megnevezesTalalat = _mindenAdat.where(
       (e) => e.megnevezes.trim().toLowerCase().contains(tisztaKeresett),
     );
@@ -1335,22 +1329,34 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final elosztoNev = _kivalasztottElosztoNev!;
     final tisztaEloszto = elosztoNev.trim().toUpperCase();
 
-    String elosztoHelye = 'HIBA: Nem találom az adatokat';
+    // Intelligens elosztó helye keresés: először kód alapján, ha nincs, akkor a leágazásokból
+    String elosztoHelye = '';
 
     for (var item in _mindenAdat) {
-      final kod = item.kod.trim().toUpperCase();
-
-      if (kod == tisztaEloszto) {
-        if (item.helyszin.trim().isNotEmpty) {
-          elosztoHelye = item.helyszin.trim();
-        } else if (item.elosztoHelye.trim().isNotEmpty) {
+      if (item.kod.trim().toUpperCase() == tisztaEloszto) {
+        if (item.elosztoHelye.trim().isNotEmpty) {
           elosztoHelye = item.elosztoHelye.trim();
-        } else {
-          elosztoHelye =
-              'A JSON szerint a helyszin és az elosztoHelye is üres!';
+          break;
+        } else if (item.helyszin.trim().isNotEmpty) {
+          elosztoHelye = item.helyszin.trim();
+          break;
         }
-        break;
       }
+    }
+
+    if (elosztoHelye.isEmpty) {
+      for (var item in _mindenAdat) {
+        if (item.elosztoNev.trim().toUpperCase() == tisztaEloszto) {
+          if (item.elosztoHelye.trim().isNotEmpty) {
+            elosztoHelye = item.elosztoHelye.trim();
+            break;
+          }
+        }
+      }
+    }
+
+    if (elosztoHelye.isEmpty) {
+      elosztoHelye = 'Helyszín nincs megadva';
     }
 
     final leagazasok = _mindenAdat
@@ -1453,17 +1459,30 @@ class _KeresoPanelState extends State<KeresoPanel> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Elosztó fizikai helye: $elosztoHelye',
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Icon(Icons.place, size: 18, color: Colors.amber[900]),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        elosztoHelye,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 12),
                 Text(
-                  'Összesen ${leagazasok.length} db leágazás található ebben az elosztóban.',
-                  style: TextStyle(fontSize: 13, color: Colors.grey[800]),
+                  '${leagazasok.length} leágazás',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
                 ),
               ],
             ),
