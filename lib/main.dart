@@ -88,6 +88,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
   BerendezesAdat? _kivalasztottBerendezes;
   String? _kivalasztottElosztoNev;
   String? _visszaElosztoNev;
+  String? _berendezesKepUrl;
 
   NezetTipus _aktualisNezet = NezetTipus.kereso;
 
@@ -317,6 +318,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
       _vanBerendezesKep = false;
       _vanElosztoKep = false;
       _vanLeagazasKep = false;
+      _berendezesKepUrl = null;
 
       _berendezesKepToltodik = true;
       _elosztoKepToltodik = true;
@@ -352,8 +354,19 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
     _elerhetoKepekKeresese(kodNev).then((kepek) {
       if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
+        if (kepek.isNotEmpty) {
+          ui.platformViewRegistry.registerViewFactory(
+            'berendezes-thumb-$kodNev',
+            (int viewId) => html.ImageElement()
+              ..src = kepek.first
+              ..style.objectFit = 'cover'
+              ..style.width = '100%'
+              ..style.height = '100%',
+          );
+        }
         setState(() {
           _vanBerendezesKep = kepek.isNotEmpty;
+          _berendezesKepUrl = kepek.isNotEmpty ? kepek.first : null;
           _berendezesKepToltodik = false;
         });
       }
@@ -1055,83 +1068,102 @@ class _KeresoPanelState extends State<KeresoPanel> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      item.kod,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue[900],
-                      ),
+                // 1. Sor: AK kód középre igazítva
+                Center(
+                  child: Text(
+                    item.kod,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue[900],
                     ),
-                    Tooltip(
-                      message: _berendezesKepToltodik
-                          ? 'Képkeresés...'
-                          : (_vanBerendezesKep
-                                ? 'Berendezés fotójának megtekintése'
-                                : 'Nincs még kép feltöltve'),
-                      child: ElevatedButton.icon(
-                        onPressed: _berendezesKepToltodik
-                            ? null
-                            : (_vanBerendezesKep
-                                  ? () => _galeriaInditasa(
-                                      kodNev,
-                                      'Berendezés: ${item.megnevezes}',
-                                    )
-                                  : () => _nincsKepUzenet(context)),
-                        icon: _berendezesKepToltodik
-                            ? const SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Icon(
-                                Icons.camera_alt,
-                                size: 18,
-                                color: _vanBerendezesKep
-                                    ? Colors.blue[900]
-                                    : Colors.grey[600],
-                              ),
-                        label: Text(
-                          'Berendezés fotó',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: _vanBerendezesKep
-                                ? Colors.blue[900]
-                                : Colors.grey[600],
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _vanBerendezesKep
-                              ? Colors.blue[50]
-                              : Colors.grey[200],
-                          elevation: _vanBerendezesKep ? 2 : 0,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 10,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  item.megnevezes,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  'Fizikai helye: ${item.helyszin}',
-                  style: const TextStyle(color: Colors.black87, fontSize: 15),
+                const SizedBox(height: 15),
+
+                // 2. Sor: 150x150 kép vagy fényképezőgép ikon (szöveg nélkül)
+                Center(
+                  child: _berendezesKepToltodik
+                      ? const SizedBox(
+                          width: 30,
+                          height: 30,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : (_vanBerendezesKep && _berendezesKepUrl != null
+                            ? GestureDetector(
+                                onTap: () => _galeriaInditasa(
+                                  kodNev,
+                                  'Berendezés: ${item.megnevezes}',
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: SizedBox(
+                                    width: 150,
+                                    height: 150,
+                                    child: HtmlElementView(
+                                      key: ValueKey('thumb-$kodNev'),
+                                      viewType: 'berendezes-thumb-$kodNev',
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : GestureDetector(
+                                onTap: () => _nincsKepUzenet(context),
+                                child: Container(
+                                  width: 150,
+                                  height: 150,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.camera_alt,
+                                      size: 36,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                              )),
+                ),
+                const SizedBox(height: 15),
+
+                // 3. Sor: Elnevezés balra igazítva
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    item.megnevezes,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // 4. Sor: Hely adat gombostűvel (vagy piros kérdőjellel)
+                Row(
+                  children: [
+                    const Text('📍 ', style: TextStyle(fontSize: 15)),
+                    Expanded(
+                      child: item.helyszin.trim().isEmpty
+                          ? const Text(
+                              '?',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            )
+                          : Text(
+                              item.helyszin,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                color: Colors.black87,
+                              ),
+                            ),
+                    ),
+                  ],
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12.0),
