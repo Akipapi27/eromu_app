@@ -1329,7 +1329,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
     final elosztoNev = _kivalasztottElosztoNev!;
     final tisztaEloszto = elosztoNev.trim().toUpperCase();
 
-    // Intelligens elosztó helye keresés: először kód alapján, ha nincs, akkor a leágazásokból
     String elosztoHelye = '';
 
     for (var item in _mindenAdat) {
@@ -1462,7 +1461,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Icon(Icons.place, size: 18, color: Colors.amber[900]),
+                    Icon(Icons.navigation, size: 18, color: Colors.amber[900]),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
