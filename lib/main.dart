@@ -1394,12 +1394,19 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      '📍  $elosztoHelye',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    Row(
+                      children: [
+                        Icon(Icons.bolt, size: 28, color: Colors.amber[900]),
+                        const SizedBox(width: 8),
+                        Text(
+                          elosztoNev,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.amber[900],
+                          ),
+                        ),
+                      ],
                     ),
                     Tooltip(
                       message: _elosztoKepToltodik
@@ -1452,20 +1459,12 @@ class _KeresoPanelState extends State<KeresoPanel> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(Icons.navigation, size: 18, color: Colors.amber[900]),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        elosztoHelye,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
+                Text(
+                  '📍  $elosztoHelye',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Text(
