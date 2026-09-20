@@ -1023,47 +1023,75 @@ class _KeresoPanelState extends State<KeresoPanel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: [
-            // 1. Szürke Kezdőlap gomb (házikó ikonnal, mindig elöl)
-            ElevatedButton.icon(
-              onPressed: _visszaAKeresohoz,
-              icon: const Icon(Icons.home, size: 18),
-              label: const Text(
-                'Kezdőlap',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[200],
-                foregroundColor: Colors.black87,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-              ),
-            ),
-            // 2. Sárga elosztó gomb (csak ha elosztóból jöttünk)
-            if (_visszaElosztoNev != null)
-              ElevatedButton.icon(
-                onPressed: () => _elosztoKivalasztasa(_visszaElosztoNev!),
-                icon: const Icon(Icons.arrow_back, size: 18),
-                label: Text(
-                  'Vissza az elosztóhoz [$_visszaElosztoNev]',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+        // Felső gombok sor: mobilon is garantáltan egymás mellett (50-50% arányban)
+        _visszaElosztoNev != null
+            ? Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _visszaAKeresohoz,
+                      icon: const Icon(Icons.home, size: 16),
+                      label: const Text(
+                        'Kezdőlap',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[200],
+                        foregroundColor: Colors.black87,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _elosztoKivalasztasa(_visszaElosztoNev!),
+                      icon: const Icon(Icons.arrow_back, size: 16),
+                      label: Text(
+                        'Elosztó [$_visszaElosztoNev]',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber[100],
+                        foregroundColor: Colors.amber[900],
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : ElevatedButton.icon(
+                onPressed: _visszaAKeresohoz,
+                icon: const Icon(Icons.home, size: 18),
+                label: const Text(
+                  'Kezdőlap',
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber[100],
-                  foregroundColor: Colors.amber[900],
+                  backgroundColor: Colors.grey[200],
+                  foregroundColor: Colors.black87,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
                     vertical: 12,
                   ),
                 ),
               ),
-          ],
-        ),
         const SizedBox(height: 15),
         Card(
           elevation: 4,
