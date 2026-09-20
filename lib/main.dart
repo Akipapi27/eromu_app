@@ -1027,12 +1027,30 @@ class _KeresoPanelState extends State<KeresoPanel> {
           spacing: 10,
           runSpacing: 10,
           children: [
+            // 1. Szürke Kezdőlap gomb (házikó ikonnal, mindig elöl)
+            ElevatedButton.icon(
+              onPressed: _visszaAKeresohoz,
+              icon: const Icon(Icons.home, size: 18),
+              label: const Text(
+                'Kezdőlap',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[200],
+                foregroundColor: Colors.black87,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+              ),
+            ),
+            // 2. Sárga elosztó gomb (csak ha elosztóból jöttünk)
             if (_visszaElosztoNev != null)
               ElevatedButton.icon(
                 onPressed: () => _elosztoKivalasztasa(_visszaElosztoNev!),
                 icon: const Icon(Icons.arrow_back, size: 18),
                 label: Text(
-                  'Vissza a elosztóhoz [$_visszaElosztoNev]',
+                  'Vissza az elosztóhoz [$_visszaElosztoNev]',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -1044,27 +1062,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
                   ),
                 ),
               ),
-            ElevatedButton.icon(
-              onPressed: _visszaAKeresohoz,
-              icon: Icon(
-                _visszaElosztoNev != null ? Icons.home : Icons.arrow_back,
-                size: 18,
-              ),
-              label: Text(
-                _visszaElosztoNev != null
-                    ? 'Főoldal / Kereső'
-                    : 'Vissza a keresőhöz',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[200],
-                foregroundColor: Colors.black87,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-              ),
-            ),
           ],
         ),
         const SizedBox(height: 15),
