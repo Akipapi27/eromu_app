@@ -1462,8 +1462,8 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 Text(
                   '📍  $elosztoHelye',
                   style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 12),
