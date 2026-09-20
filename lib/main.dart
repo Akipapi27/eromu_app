@@ -361,7 +361,8 @@ class _KeresoPanelState extends State<KeresoPanel> {
               ..src = kepek.first
               ..style.objectFit = 'cover'
               ..style.width = '100%'
-              ..style.height = '100%',
+              ..style.height = '100%'
+              ..style.pointerEvents = 'none',
           );
         }
         setState(() {
@@ -1081,7 +1082,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 ),
                 const SizedBox(height: 15),
 
-                // 2. Sor: 150x150 kép vagy fényképezőgép ikon (szöveg nélkül)
+                // 2. Sor: 150x150-es kép vagy fényképezőgép ikon gombként
                 Center(
                   child: _berendezesKepToltodik
                       ? const SizedBox(
@@ -1095,11 +1096,27 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                   kodNev,
                                   'Berendezés: ${item.megnevezes}',
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: SizedBox(
-                                    width: 150,
-                                    height: 150,
+                                child: Container(
+                                  width: 150,
+                                  height: 150,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Colors.blue[300]!,
+                                      width: 2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.1,
+                                        ),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
                                     child: HtmlElementView(
                                       key: ValueKey('thumb-$kodNev'),
                                       viewType: 'berendezes-thumb-$kodNev',
@@ -1113,13 +1130,26 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                   width: 150,
                                   height: 150,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(8),
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Colors.grey[300]!,
+                                      width: 2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.05,
+                                        ),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
                                   ),
                                   child: Center(
                                     child: Icon(
                                       Icons.camera_alt,
-                                      size: 36,
+                                      size: 40,
                                       color: Colors.grey[600],
                                     ),
                                   ),
