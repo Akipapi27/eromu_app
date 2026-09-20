@@ -35,7 +35,7 @@ class BerendezesAdat {
   final String helyszin;
   final String elosztoNev;
   final String leagazasJel;
-  String elosztoHelye;
+  final String elosztoHelye;
   final String feljegyzes;
   final int verzio;
 
@@ -299,7 +299,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
     setState(() {
       _szurtElosztoLista = egyediElosztok.where((e) {
-        return !e.contains('_') && e.toLowerCase().contains(szo);
+        return !e.contains('_') && e.toLowerCase().startsWith(szo);
       }).toList();
       _szurtElosztoLista.sort();
     });
