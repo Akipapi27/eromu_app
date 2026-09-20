@@ -1394,19 +1394,12 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Icon(Icons.bolt, size: 28, color: Colors.amber[900]),
-                        const SizedBox(width: 8),
-                        Text(
-                          elosztoNev,
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.amber[900],
-                          ),
-                        ),
-                      ],
+                    Text(
+                      '📍  $elosztoHelye',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     Tooltip(
                       message: _elosztoKepToltodik
