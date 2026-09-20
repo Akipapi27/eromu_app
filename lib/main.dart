@@ -357,12 +357,21 @@ class _KeresoPanelState extends State<KeresoPanel> {
         if (kepek.isNotEmpty) {
           ui.platformViewRegistry.registerViewFactory(
             'berendezes-thumb-$kodNev',
-            (int viewId) => html.ImageElement()
-              ..src = kepek.first
-              ..style.objectFit = 'cover'
-              ..style.width = '100%'
-              ..style.height = '100%'
-              ..style.pointerEvents = 'none',
+            (int viewId) {
+              final img = html.ImageElement()
+                ..src = kepek.first
+                ..style.objectFit = 'cover'
+                ..style.width = '100%'
+                ..style.height = '100%'
+                ..style.cursor = 'pointer';
+
+              img.onClick.listen((_) {
+                if (mounted) {
+                  _galeriaInditasa(kodNev, 'Berendezés: ${item.megnevezes}');
+                }
+              });
+              return img;
+            },
           );
         }
         setState(() {
@@ -1082,7 +1091,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 ),
                 const SizedBox(height: 15),
 
-                // 2. Sor: 150x150-es kép vagy fényképezőgép ikon gombként
+                // 2. Sor: 150x150-es kép vagy fényképezőgép ikon gombként (kattintható)
                 Center(
                   child: _berendezesKepToltodik
                       ? const SizedBox(
@@ -1091,36 +1100,30 @@ class _KeresoPanelState extends State<KeresoPanel> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : (_vanBerendezesKep && _berendezesKepUrl != null
-                            ? GestureDetector(
-                                onTap: () => _galeriaInditasa(
-                                  kodNev,
-                                  'Berendezés: ${item.megnevezes}',
-                                ),
-                                child: Container(
-                                  width: 150,
-                                  height: 150,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: Colors.blue[300]!,
-                                      width: 2,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(
-                                          alpha: 0.1,
-                                        ),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
+                            ? Container(
+                                width: 150,
+                                height: 150,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Colors.blue[300]!,
+                                    width: 2,
                                   ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: HtmlElementView(
-                                      key: ValueKey('thumb-$kodNev'),
-                                      viewType: 'berendezes-thumb-$kodNev',
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
                                     ),
+                                  ],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: HtmlElementView(
+                                    key: ValueKey('thumb-$kodNev'),
+                                    viewType: 'berendezes-thumb-$kodNev',
                                   ),
                                 ),
                               )
