@@ -1075,7 +1075,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Sor: AK kód középre igazítva
+                // Felső rész (4 soros kártya teteje)
                 Center(
                   child: Text(
                     item.kod,
@@ -1087,8 +1087,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
                   ),
                 ),
                 const SizedBox(height: 15),
-
-                // 2. Sor: 150x150-es kép vagy fényképezőgép ikon gombként (kattintható)
                 Center(
                   child: _berendezesKepToltodik
                       ? const SizedBox(
@@ -1157,8 +1155,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
                               )),
                 ),
                 const SizedBox(height: 15),
-
-                // 3. Sor: Elnevezés balra igazítva
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -1170,8 +1166,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
-                // 4. Sor: Hely adat gombostűvel (vagy piros kérdőjellel)
                 Row(
                   children: [
                     const Text('📍 ', style: TextStyle(fontSize: 15)),
@@ -1199,168 +1193,167 @@ class _KeresoPanelState extends State<KeresoPanel> {
                   padding: EdgeInsets.symmetric(vertical: 12.0),
                   child: Divider(),
                 ),
+
+                // --- ALSÓ RÉSZ (4 SORBAN) ---
+
+                // 1. Sor: Tápláló elosztó link és Elosztó fotó gomb
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              InkWell(
-                                onTap: () =>
-                                    _elosztoKivalasztasa(item.elosztoNev),
-                                child: Text(
-                                  'Tápláló elosztó: ${item.elosztoNev} 🔗',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: Colors.blue[900],
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              if (item.leagazasJel.isNotEmpty)
-                                Text(
-                                  '[Leágazás: ${item.leagazasJel}]',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey[700],
-                                    fontSize: 14,
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Elosztó helye: ${_keresHelyszin(item.elosztoNev)}',
-                            style: TextStyle(
-                              color: Colors.grey[800],
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
+                    InkWell(
+                      onTap: () => _elosztoKivalasztasa(item.elosztoNev),
+                      child: Text(
+                        'Tápláló elosztó: ${item.elosztoNev} 🔗',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: Colors.blue[900],
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Tooltip(
-                          message: _elosztoKepToltodik
-                              ? 'Képkeresés...'
-                              : (_vanElosztoKep
-                                    ? 'Elosztó fotójának megtekintése'
-                                    : 'Nincs még kép feltöltve'),
-                          child: ElevatedButton.icon(
-                            onPressed: _elosztoKepToltodik
-                                ? null
-                                : (_vanElosztoKep
-                                      ? () => _galeriaInditasa(
-                                          elosztoNev,
-                                          'Elosztó: ${item.elosztoNev}',
-                                        )
-                                      : () => _nincsKepUzenet(context)),
-                            icon: _elosztoKepToltodik
-                                ? const SizedBox(
-                                    width: 14,
-                                    height: 14,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Icon(
-                                    Icons.bolt,
-                                    size: 18,
-                                    color: _vanElosztoKep
-                                        ? Colors.amber[900]
-                                        : Colors.grey[600],
-                                  ),
-                            label: Text(
-                              'Elosztó fotó',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
+                    Tooltip(
+                      message: _elosztoKepToltodik
+                          ? 'Képkeresés...'
+                          : (_vanElosztoKep
+                                ? 'Elosztó fotójának megtekintése'
+                                : 'Nincs még kép feltöltve'),
+                      child: ElevatedButton.icon(
+                        onPressed: _elosztoKepToltodik
+                            ? null
+                            : (_vanElosztoKep
+                                  ? () => _galeriaInditasa(
+                                      elosztoNev,
+                                      'Elosztó: ${item.elosztoNev}',
+                                    )
+                                  : () => _nincsKepUzenet(context)),
+                        icon: _elosztoKepToltodik
+                            ? const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Icon(
+                                Icons.bolt,
+                                size: 18,
                                 color: _vanElosztoKep
                                     ? Colors.amber[900]
                                     : Colors.grey[600],
                               ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _vanElosztoKep
-                                  ? Colors.amber[50]
-                                  : Colors.grey[200],
-                              elevation: _vanElosztoKep ? 2 : 0,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 10,
-                              ),
-                            ),
+                        label: Text(
+                          'Elosztó fotó',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: _vanElosztoKep
+                                ? Colors.amber[900]
+                                : Colors.grey[600],
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Tooltip(
-                          message: _leagazasKepToltodik
-                              ? 'Képkeresés...'
-                              : (_vanLeagazasKep
-                                    ? 'Leágazás fotójának megtekintése'
-                                    : 'Nincs még kép feltöltve'),
-                          child: ElevatedButton.icon(
-                            onPressed: _leagazasKepToltodik
-                                ? null
-                                : (_vanLeagazasKep
-                                      ? () => _galeriaInditasa(
-                                          leagazasNev,
-                                          'Leágazás: ${item.leagazasJel}',
-                                        )
-                                      : () => _nincsKepUzenet(context)),
-                            icon: _leagazasKepToltodik
-                                ? const SizedBox(
-                                    width: 14,
-                                    height: 14,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Icon(
-                                    Icons.camera_alt_outlined,
-                                    size: 18,
-                                    color: _vanLeagazasKep
-                                        ? Colors.blue[900]
-                                        : Colors.grey[600],
-                                  ),
-                            label: Text(
-                              'Leágazás fotó',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: _vanLeagazasKep
-                                    ? Colors.blue[900]
-                                    : Colors.grey[600],
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _vanLeagazasKep
-                                  ? Colors.blue[50]
-                                  : Colors.grey[200],
-                              elevation: _vanLeagazasKep ? 2 : 0,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 10,
-                              ),
-                            ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _vanElosztoKep
+                              ? Colors.amber[50]
+                              : Colors.grey[200],
+                          elevation: _vanElosztoKep ? 2 : 0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 10),
+
+                // 2. Sor: Gombostű és utána az elosztó helye
+                Row(
+                  children: [
+                    const Text('📍 ', style: TextStyle(fontSize: 14)),
+                    Expanded(
+                      child: Text(
+                        'Elosztó helye: ${_keresHelyszin(item.elosztoNev)}',
+                        style: TextStyle(color: Colors.grey[800], fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+
+                // 3. Sor: Leágazás (zárójel nélkül) és Leágazás fotó gomb
+                if (item.leagazasJel.isNotEmpty) ...[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Leágazás: ${item.leagazasJel}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[700],
+                          fontSize: 14,
+                        ),
+                      ),
+                      Tooltip(
+                        message: _leagazasKepToltodik
+                            ? 'Képkeresés...'
+                            : (_vanLeagazasKep
+                                  ? 'Leágazás fotójának megtekintése'
+                                  : 'Nincs még kép feltöltve'),
+                        child: ElevatedButton.icon(
+                          onPressed: _leagazasKepToltodik
+                              ? null
+                              : (_vanLeagazasKep
+                                    ? () => _galeriaInditasa(
+                                        leagazasNev,
+                                        'Leágazás: ${item.leagazasJel}',
+                                      )
+                                    : () => _nincsKepUzenet(context)),
+                          icon: _leagazasKepToltodik
+                              ? const SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Icon(
+                                  Icons.camera_alt_outlined,
+                                  size: 18,
+                                  color: _vanLeagazasKep
+                                      ? Colors.blue[900]
+                                      : Colors.grey[600],
+                                ),
+                          label: Text(
+                            'Leágazás fotó',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: _vanLeagazasKep
+                                  ? Colors.blue[900]
+                                  : Colors.grey[600],
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _vanLeagazasKep
+                                ? Colors.blue[50]
+                                : Colors.grey[200],
+                            elevation: _vanLeagazasKep ? 2 : 0,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                ],
+
+                // 4. Sor: Feljegyzés / Szívás doboz (ha van)
                 if (item.feljegyzes.isNotEmpty) ...[
-                  const SizedBox(height: 15),
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
@@ -1577,7 +1570,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 1. Felső sor: sárga gomb balra, kék gomb jobbra
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1633,7 +1625,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        // 2. Középső sor: berendezés megnevezése (dinamikus, 1-2 soros)
                         Text(
                           elem.megnevezes,
                           style: const TextStyle(
@@ -1644,7 +1635,6 @@ class _KeresoPanelState extends State<KeresoPanel> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 6),
-                        // 3. Alsó sor: hely adat gombostűvel
                         Row(
                           children: [
                             const Text('📍 ', style: TextStyle(fontSize: 13)),
