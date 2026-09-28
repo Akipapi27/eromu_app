@@ -264,7 +264,7 @@
         "verzio": 20260730
     },
     {
-        "kod": "BET_PL_L_S_A_4BA_FEL_L",
+        "kod": "4BA01",
         "megnevezes": "Betáplálás a 4BA01 felől",
         "helyszin": "",
         "elosztoNev": "2BA",
@@ -432,7 +432,7 @@
         "verzio": 20260730
     },
     {
-        "kod": "Tartalék_2CA_2",
+        "kod": "2CA_2",
         "megnevezes": "Tartalék",
         "helyszin": "",
         "elosztoNev": "2CA",
@@ -528,7 +528,7 @@
         "verzio": 20260730
     },
     {
-        "kod": "Tartalék_2CB_1",
+        "kod": "2CB_1",
         "megnevezes": "Tartalék",
         "helyszin": "",
         "elosztoNev": "2CB",
@@ -564,7 +564,7 @@
         "verzio": 20260730
     },
     {
-        "kod": "Tartalék_2CB_2",
+        "kod": "2CB_2",
         "megnevezes": "Tartalék",
         "helyszin": "",
         "elosztoNev": "2CB",
