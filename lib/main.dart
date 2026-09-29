@@ -115,7 +115,7 @@ class _KeresoPanelState extends State {
     _elosztoKeresoCtrl.addListener(_elosztoSzuresVegrehajtasa);
   }
 
-  Future _szuperFrissites() async {
+  _szuperFrissites() async {
     setState(() {
       _isLoading = true;
     });
@@ -143,7 +143,6 @@ class _KeresoPanelState extends State {
     if (kod.trim().isEmpty) return 'Nincs megadva';
     final tisztaKeresett = kod.trim().toUpperCase();
 
-    // 1. Keresés, ahol a kód megegyezik (prioritás az elosztoHelye-nek)
     for (var item in _mindenAdat) {
       if (item.kod.trim().toUpperCase() == tisztaKeresett) {
         if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
@@ -151,7 +150,6 @@ class _KeresoPanelState extends State {
       }
     }
 
-    // 2. Keresés, ahol az elosztoNev megegyezik
     for (var item in _mindenAdat) {
       if (item.elosztoNev.trim().toUpperCase() == tisztaKeresett) {
         if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
@@ -159,7 +157,6 @@ class _KeresoPanelState extends State {
       }
     }
 
-    // 3. Megnevezés alapú keresés
     for (var item in _mindenAdat) {
       if (item.megnevezes.trim().toUpperCase().contains(tisztaKeresett)) {
         if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
@@ -209,7 +206,7 @@ class _KeresoPanelState extends State {
     return null;
   }
 
-  Future _adatbazisBetoltese() async {
+  _adatbazisBetoltese() async {
     try {
       final alapUrl = Uri.base
           .resolve('assets/eromu_adatbazis.json')
@@ -238,10 +235,10 @@ class _KeresoPanelState extends State {
         _utolsoFrissites = 'Nem meghatározható';
       }
 
-      final List jsonLista = jsonDecode(
+      final jsonLista = jsonDecode(
         utf8.decode(response.bodyBytes),
       );
-      final list = jsonLista
+      final list = (jsonLista as List)
           .map((item) => BerendezesAdat.fromJson(item))
           .toList();
 
@@ -289,10 +286,13 @@ class _KeresoPanelState extends State {
       return;
     }
 
-    final egyediElosztok = {};
+    var egyediElosztok = [];
     for (var e in _mindenAdat) {
-      if (e.kod.trim().isNotEmpty) egyediElosztok.add(e.kod.trim());
-      if (e.elosztoNev.trim().isNotEmpty) {
+      if (e.kod.trim().isNotEmpty && !egyediElosztok.contains(e.kod.trim())) {
+        egyediElosztok.add(e.kod.trim());
+      }
+      if (e.elosztoNev.trim().isNotEmpty &&
+          !egyediElosztok.contains(e.elosztoNev.trim())) {
         egyediElosztok.add(e.elosztoNev.trim());
       }
     }
@@ -421,7 +421,7 @@ class _KeresoPanelState extends State {
     });
   }
 
-  Future _kepLetezikE(String url) async {
+  _kepLetezikE(String url) async {
     try {
       final response = await http.get(Uri.parse(url));
       return response.statusCode == 200;
@@ -430,10 +430,7 @@ class _KeresoPanelState extends State {
     }
   }
 
-  Future _keresElerhetoKepet(
-    String alapMappaUrl,
-    String fajlNev,
-  ) async {
+  _keresElerhetoKepet(String alapMappaUrl, String fajlNev) async {
     List verziok = [
       '\(alapMappaUrl\)fajlNev.jpg',
       '\(alapMappaUrl\)fajlNev.JPG',
@@ -451,13 +448,13 @@ class _KeresoPanelState extends State {
     return null;
   }
 
-  Future> _elerhetoKepekKeresese(String alapNev) async {
+  _elerhetoKepekKeresese(String alapNev) async {
     if (alapNev.isEmpty) return [];
 
     String tisztaAlapNev = alapNev.trim().toUpperCase();
     if (tisztaAlapNev.isEmpty) return [];
 
-    List talalatok = [];
+    var talalatok = [];
     final buster = _getCacheBuster();
     final alapMappaUrl = Uri.base.resolve('assets/').toString();
 
@@ -1023,7 +1020,6 @@ class _KeresoPanelState extends State {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Felső gombok sor: mobilon is garantáltan egymás mellett (50-50% arányban)
         _visszaElosztoNev != null
             ? Row(
                 children: [
@@ -1097,7 +1093,6 @@ class _KeresoPanelState extends State {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Felső rész (4 soros kártya teteje)
                 Center(
                   child: Text(
                     item.kod,
@@ -1211,10 +1206,6 @@ class _KeresoPanelState extends State {
                   padding: EdgeInsets.symmetric(vertical: 12.0),
                   child: Divider(),
                 ),
-
-                // --- ALSÓ RÉSZ (4 SORBAN) ---
-                
-                // 1. Sor: Tápláló elosztó link és Elosztó fotó gomb
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -1285,8 +1276,6 @@ class _KeresoPanelState extends State {
                   ],
                 ),
                 const SizedBox(height: 10),
-
-                // 2. Sor: Gombostű és utána közvetlenül a tápláló elosztó helye
                 Row(
                   children: [
                     const Text('📍 ', style: TextStyle(fontSize: 14)),
@@ -1302,8 +1291,6 @@ class _KeresoPanelState extends State {
                   ],
                 ),
                 const SizedBox(height: 10),
-
-                // 3. Sor: Leágazás (zárójel nélkül) és Leágazás fotó gomb
                 if (item.leagazasJel.isNotEmpty) ...[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1372,8 +1359,6 @@ class _KeresoPanelState extends State {
                   ),
                   const SizedBox(height: 10),
                 ],
-
-                // 4. Sor: Feljegyzés / Szívás doboz (ha van)
                 if (item.feljegyzes.isNotEmpty) ...[
                   Container(
                     width: double.infinity,
@@ -1652,8 +1637,6 @@ class _KeresoPanelState extends State {
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 6),
                         Row(
