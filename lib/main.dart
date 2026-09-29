@@ -1426,26 +1426,8 @@ class _KeresoPanelState extends State {
         if (item.elosztoHelye.trim().isNotEmpty) {
           elosztoHelye = item.elosztoHelye.trim();
           break;
-        } else if (item.helyszin.trim().isNotEmpty) {
-          elosztoHelye = item.helyszin.trim();
-          break;
         }
       }
-    }
-
-    if (elosztoHelye.isEmpty) {
-      for (var item in _mindenAdat) {
-        if (item.elosztoNev.trim().toUpperCase() == tisztaEloszto) {
-          if (item.elosztoHelye.trim().isNotEmpty) {
-            elosztoHelye = item.elosztoHelye.trim();
-            break;
-          }
-        }
-      }
-    }
-
-    if (elosztoHelye.isEmpty) {
-      elosztoHelye = 'Helyszín nincs megadva';
     }
 
     final leagazasok = _mindenAdat
@@ -1549,12 +1531,28 @@ class _KeresoPanelState extends State {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  '📍  ' + elosztoHelye,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    const Text('📍 ', style: TextStyle(fontSize: 16)),
+                    Expanded(
+                      child: elosztoHelye.isEmpty
+                          ? const Text(
+                              '?',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            )
+                          : Text(
+                              elosztoHelye,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 Text(
