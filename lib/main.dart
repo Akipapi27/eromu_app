@@ -145,18 +145,9 @@ class _KeresoPanelState extends State {
     if (kod.trim().isEmpty) return '';
     final tisztaKeresett = kod.trim().toUpperCase();
 
-    // 1. Megkeressük, ha a kód megegyezik (pl. maga az elosztó fősor)
+    // Kizárólag az elosztó saját sorát keresjük (ahol a kód = elosztó név)
     for (var item in _mindenAdat) {
       if (item.kod.trim().toUpperCase() == tisztaKeresett) {
-        if (item.elosztoHelye.trim().isNotEmpty) {
-          return item.elosztoHelye.trim();
-        }
-      }
-    }
-
-    // 2. Megkeressük az adott elosztóhoz tartozó sorok valamelyikét, amiben van elosztoHelye
-    for (var item in _mindenAdat) {
-      if (item.elosztoNev.trim().toUpperCase() == tisztaKeresett) {
         if (item.elosztoHelye.trim().isNotEmpty) {
           return item.elosztoHelye.trim();
         }
