@@ -50,7 +50,7 @@ class BerendezesAdat {
     required this.verzio,
   });
 
-  factory BerendezesAdat.fromJson(Map<String, dynamic> json) {
+  factory BerendezesAdat.fromJson(Map json) {
     dynamic v = json['verzio'];
     int intVerzio = 0;
     if (v != null) {
@@ -77,13 +77,13 @@ class KeresoPanel extends StatefulWidget {
   const KeresoPanel({super.key});
 
   @override
-  State<KeresoPanel> createState() => _KeresoPanelState();
+  State createState() => _KeresoPanelState();
 }
 
-class _KeresoPanelState extends State<KeresoPanel> {
-  List<BerendezesAdat> _mindenAdat = [];
-  List<BerendezesAdat> _szurtBerendezesLista = [];
-  List<String> _szurtElosztoLista = [];
+class _KeresoPanelState extends State {
+  List _mindenAdat = [];
+  List _szurtBerendezesLista = [];
+  List _szurtElosztoLista = [];
 
   BerendezesAdat? _kivalasztottBerendezes;
   String? _kivalasztottElosztoNev;
@@ -115,7 +115,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
     _elosztoKeresoCtrl.addListener(_elosztoSzuresVegrehajtasa);
   }
 
-  Future<void> _szuperFrissites() async {
+  Future _szuperFrissites() async {
     setState(() {
       _isLoading = true;
     });
@@ -133,7 +133,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
     try {
       final currentUrl = html.window.location.href.split('?').first;
       html.window.location.href =
-          '$currentUrl?cb=${DateTime.now().millisecondsSinceEpoch}';
+          '\(currentUrl?cb=\){DateTime.now().millisecondsSinceEpoch}';
     } catch (_) {
       _adatbazisBetoltese();
     }
@@ -141,30 +141,30 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
   String _keresHelyszin(String kod) {
     if (kod.trim().isEmpty) return 'Nincs megadva';
-    final tisztaKeresett = kod.trim().toLowerCase();
+    final tisztaKeresett = kod.trim().toUpperCase();
 
-    var talalat = _mindenAdat.where(
-      (e) => e.kod.trim().toLowerCase() == tisztaKeresett,
-    );
-    for (var item in talalat) {
-      if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
-      if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
+    // 1. Keresés, ahol a kód megegyezik (prioritás az elosztoHelye-nek)
+    for (var item in _mindenAdat) {
+      if (item.kod.trim().toUpperCase() == tisztaKeresett) {
+        if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
+        if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
+      }
     }
 
-    var leagazasok = _mindenAdat.where(
-      (e) => e.elosztoNev.trim().toLowerCase() == tisztaKeresett,
-    );
-    for (var item in leagazasok) {
-      if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
-      if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
+    // 2. Keresés, ahol az elosztoNev megegyezik
+    for (var item in _mindenAdat) {
+      if (item.elosztoNev.trim().toUpperCase() == tisztaKeresett) {
+        if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
+        if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
+      }
     }
 
-    var megnevezesTalalat = _mindenAdat.where(
-      (e) => e.megnevezes.trim().toLowerCase().contains(tisztaKeresett),
-    );
-    for (var item in megnevezesTalalat) {
-      if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
-      if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
+    // 3. Megnevezés alapú keresés
+    for (var item in _mindenAdat) {
+      if (item.megnevezes.trim().toUpperCase().contains(tisztaKeresett)) {
+        if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
+        if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
+      }
     }
 
     return 'Nincs megadva';
@@ -202,19 +202,19 @@ class _KeresoPanelState extends State<KeresoPanel> {
           };
           final honap = honapok[honapNev.substring(0, 3)] ?? '01';
 
-          return DateTime.parse('$ev-$honap-${nap.padLeft(2, '0')}T${ido}Z');
+          return DateTime.parse('\(ev-\)honap-\({nap.padLeft(2, '0')}T\){ido}Z');
         }
       } catch (_) {}
     }
     return null;
   }
 
-  Future<void> _adatbazisBetoltese() async {
+  Future _adatbazisBetoltese() async {
     try {
       final alapUrl = Uri.base
           .resolve('assets/eromu_adatbazis.json')
           .toString();
-      final urlKenszeritve = Uri.parse('$alapUrl?v=${_getCacheBuster()}');
+      final urlKenszeritve = Uri.parse('\(alapUrl?v=\){_getCacheBuster()}');
 
       final response = await http.get(urlKenszeritve);
 
@@ -230,7 +230,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
               '${helyiIdo.year}. '
               '${helyiIdo.month.toString().padLeft(2, '0')}. '
               '${helyiIdo.day.toString().padLeft(2, '0')}. '
-              '${helyiIdo.hour.toString().padLeft(2, '0')}:${helyiIdo.minute.toString().padLeft(2, '0')}';
+              '\({helyiIdo.hour.toString().padLeft(2, '0')}:\){helyiIdo.minute.toString().padLeft(2, '0')}';
         } else {
           _utolsoFrissites = 'Ismeretlen dátumformátum';
         }
@@ -238,7 +238,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
         _utolsoFrissites = 'Nem meghatározható';
       }
 
-      final List<dynamic> jsonLista = jsonDecode(
+      final List jsonLista = jsonDecode(
         utf8.decode(response.bodyBytes),
       );
       final list = jsonLista
@@ -289,7 +289,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
       return;
     }
 
-    final egyediElosztok = <String>{};
+    final egyediElosztok = {};
     for (var e in _mindenAdat) {
       if (e.kod.trim().isNotEmpty) egyediElosztok.add(e.kod.trim());
       if (e.elosztoNev.trim().isNotEmpty) {
@@ -421,7 +421,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
     });
   }
 
-  Future<bool> _kepLetezikE(String url) async {
+  Future _kepLetezikE(String url) async {
     try {
       final response = await http.get(Uri.parse(url));
       return response.statusCode == 200;
@@ -430,17 +430,17 @@ class _KeresoPanelState extends State<KeresoPanel> {
     }
   }
 
-  Future<String?> _keresElerhetoKepet(
+  Future _keresElerhetoKepet(
     String alapMappaUrl,
     String fajlNev,
   ) async {
-    List<String> verziok = [
-      '$alapMappaUrl$fajlNev.jpg',
-      '$alapMappaUrl$fajlNev.JPG',
-      '$alapMappaUrl${fajlNev.toLowerCase()}.jpg',
-      '$alapMappaUrl${fajlNev.toLowerCase()}.JPG',
-      '$alapMappaUrl${fajlNev.toLowerCase()}.webp',
-      '$alapMappaUrl${fajlNev.toLowerCase()}.png',
+    List verziok = [
+      '\(alapMappaUrl\)fajlNev.jpg',
+      '\(alapMappaUrl\)fajlNev.JPG',
+      '\(alapMappaUrl\){fajlNev.toLowerCase()}.jpg',
+      '\(alapMappaUrl\){fajlNev.toLowerCase()}.JPG',
+      '\(alapMappaUrl\){fajlNev.toLowerCase()}.webp',
+      '\(alapMappaUrl\){fajlNev.toLowerCase()}.png',
     ];
 
     for (var url in verziok) {
@@ -451,13 +451,13 @@ class _KeresoPanelState extends State<KeresoPanel> {
     return null;
   }
 
-  Future<List<String>> _elerhetoKepekKeresese(String alapNev) async {
+  Future> _elerhetoKepekKeresese(String alapNev) async {
     if (alapNev.isEmpty) return [];
 
     String tisztaAlapNev = alapNev.trim().toUpperCase();
     if (tisztaAlapNev.isEmpty) return [];
 
-    List<String> talalatok = [];
+    List talalatok = [];
     final buster = _getCacheBuster();
     final alapMappaUrl = Uri.base.resolve('assets/').toString();
 
@@ -466,16 +466,16 @@ class _KeresoPanelState extends State<KeresoPanel> {
       tisztaAlapNev,
     );
     if (elsoTalalatUrl != null) {
-      talalatok.add('$elsoTalalatUrl?v=$buster');
+      talalatok.add('\(elsoTalalatUrl?v=\)buster');
     }
 
     for (int i = 1; i <= 9; i++) {
       final sorszamosUrl = await _keresElerhetoKepet(
         alapMappaUrl,
-        '$tisztaAlapNev-$i',
+        '\(tisztaAlapNev-\)i',
       );
       if (sorszamosUrl != null) {
-        final teljesUrl = '$sorszamosUrl?v=$buster';
+        final teljesUrl = '\(sorszamosUrl?v=\)buster';
         if (!talalatok.contains(teljesUrl)) {
           talalatok.add(teljesUrl);
         }
@@ -505,7 +505,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
   }
 
   void _galeriaMegnyitasa(
-    List<String> kepurlEk,
+    List kepurlEk,
     String cim,
     String egyediAzonosito,
   ) {
@@ -514,7 +514,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
 
     void regisztralKepatmero(String url, int index) {
       ui.platformViewRegistry.registerViewFactory(
-        'html-image-$egyediAzonosito-$index',
+        'html-image-\(egyediAzonosito-\)index',
         (int viewId) => html.ImageElement()
           ..src = url
           ..style.objectFit = 'contain'
@@ -571,7 +571,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                '${aktualisIndex + 1} / ${kepurlEk.length}',
+                                '\({aktualisIndex + 1} /\){kepurlEk.length}',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -609,10 +609,10 @@ class _KeresoPanelState extends State<KeresoPanel> {
                               maxScale: 10.0,
                               child: HtmlElementView(
                                 key: ValueKey(
-                                  'view-$egyediAzonosito-$aktualisIndex',
+                                  'view-\(egyediAzonosito-\)aktualisIndex',
                                 ),
                                 viewType:
-                                    'html-image-$egyediAzonosito-$aktualisIndex',
+                                    'html-image-\(egyediAzonosito-\)aktualisIndex',
                               ),
                             ),
                           ),
@@ -1033,10 +1033,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                       icon: const Icon(Icons.home, size: 16),
                       label: const Text(
                         'Kezdőlap',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -1057,10 +1054,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                       icon: const Icon(Icons.arrow_back, size: 16),
                       label: Text(
                         'Elosztó [$_visszaElosztoNev]',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -1123,64 +1117,60 @@ class _KeresoPanelState extends State<KeresoPanel> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : (_vanBerendezesKep && _berendezesKepUrl != null
-                            ? Container(
+                          ? Container(
+                              width: 150,
+                              height: 150,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Colors.blue[300]!,
+                                  width: 2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.1),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: HtmlElementView(
+                                  key: ValueKey('thumb-$kodNev'),
+                                  viewType: 'berendezes-thumb-$kodNev',
+                                ),
+                              ),
+                            )
+                          : GestureDetector(
+                              onTap: () => _nincsKepUzenet(context),
+                              child: Container(
                                 width: 150,
                                 height: 150,
                                 decoration: BoxDecoration(
+                                  color: Colors.grey[100],
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: Colors.blue[300]!,
+                                    color: Colors.grey[300]!,
                                     width: 2,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.1,
-                                      ),
+                                      color: Colors.black.withValues(alpha: 0.05),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
                                   ],
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: HtmlElementView(
-                                    key: ValueKey('thumb-$kodNev'),
-                                    viewType: 'berendezes-thumb-$kodNev',
+                                child: Center(
+                                  child: Icon(
+                                    Icons.camera_alt,
+                                    size: 40,
+                                    color: Colors.grey[600],
                                   ),
                                 ),
-                              )
-                            : GestureDetector(
-                                onTap: () => _nincsKepUzenet(context),
-                                child: Container(
-                                  width: 150,
-                                  height: 150,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[100],
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: Colors.grey[300]!,
-                                      width: 2,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(
-                                          alpha: 0.05,
-                                        ),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.camera_alt,
-                                      size: 40,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ),
-                              )),
+                              ),
+                            )),
                 ),
                 const SizedBox(height: 15),
                 Align(
@@ -1223,7 +1213,7 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 ),
 
                 // --- ALSÓ RÉSZ (4 SORBAN) ---
-
+                
                 // 1. Sor: Tápláló elosztó link és Elosztó fotó gomb
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1296,14 +1286,17 @@ class _KeresoPanelState extends State<KeresoPanel> {
                 ),
                 const SizedBox(height: 10),
 
-                // 2. Sor: Gombostű és utána közvetlenül az elosztó helye (szöveg nélkül)
+                // 2. Sor: Gombostű és utána közvetlenül a tápláló elosztó helye
                 Row(
                   children: [
                     const Text('📍 ', style: TextStyle(fontSize: 14)),
                     Expanded(
                       child: Text(
                         _keresHelyszin(item.elosztoNev),
-                        style: TextStyle(color: Colors.grey[800], fontSize: 14),
+                        style: TextStyle(
+                          color: Colors.grey[800],
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ],
