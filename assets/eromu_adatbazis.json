@@ -2,7 +2,7 @@
     {
         "kod": "2CT04",
         "megnevezes": "Égéslevegő ventilátor motor frekvenciaváltó transzformátora",
-        "helyszin": "2DB elosztóban",
+        "helyszin": "2DB elosztó előterében",
         "elosztoNev": "2BA",
         "leagazasJel": "2BA01",
         "elosztoHelye": "II. blokk, 0m, gépház és kazánház közötti átjáróban.",
@@ -14100,7 +14100,7 @@
         "verzio": 20260731
     },
     {
-        "kod": "6DB_8",
+        "kod": "6DB_08",
         "megnevezes": "6DB jelű alelo.betáp.",
         "helyszin": "Kazánház, 7,5m, D-i falon, a 6DA alelosztó mellett.",
         "elosztoNev": "6CB",
@@ -14124,7 +14124,7 @@
         "verzio": 20260731
     },
     {
-        "kod": "6DF_6",
+        "kod": "6DF_06",
         "megnevezes": "6DF jelű alelo.betáp.",
         "helyszin": "Kazánház, 7,5m, a DNY-i sarokban lévő elosztó helyiségben.",
         "elosztoNev": "6CB",
@@ -14136,7 +14136,7 @@
         "verzio": 20260731
     },
     {
-        "kod": "6DH_8",
+        "kod": "6DH_08",
         "megnevezes": "6DH jelű alelo.betáp",
         "helyszin": "Kazánház, 7,5m, a DNY-i sarokban lévő elosztó helyiségben.",
         "elosztoNev": "6CB",
