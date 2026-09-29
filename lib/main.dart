@@ -142,34 +142,28 @@ class _KeresoPanelState extends State {
   }
 
   String _keresHelyszin(String kod) {
-    if (kod.trim().isEmpty) return 'Nincs megadva';
+    if (kod.trim().isEmpty) return '';
     final tisztaKeresett = kod.trim().toUpperCase();
 
+    // 1. Megkeressük, ha a kód megegyezik (pl. maga az elosztó fősor)
     for (var item in _mindenAdat) {
       if (item.kod.trim().toUpperCase() == tisztaKeresett) {
-        if (item.elosztoHelye.trim().isNotEmpty)
+        if (item.elosztoHelye.trim().isNotEmpty) {
           return item.elosztoHelye.trim();
-        if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
+        }
       }
     }
 
+    // 2. Megkeressük az adott elosztóhoz tartozó sorok valamelyikét, amiben van elosztoHelye
     for (var item in _mindenAdat) {
       if (item.elosztoNev.trim().toUpperCase() == tisztaKeresett) {
-        if (item.elosztoHelye.trim().isNotEmpty)
+        if (item.elosztoHelye.trim().isNotEmpty) {
           return item.elosztoHelye.trim();
-        if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
+        }
       }
     }
 
-    for (var item in _mindenAdat) {
-      if (item.megnevezes.trim().toUpperCase().contains(tisztaKeresett)) {
-        if (item.elosztoHelye.trim().isNotEmpty)
-          return item.elosztoHelye.trim();
-        if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
-      }
-    }
-
-    return 'Nincs megadva';
+    return '';
   }
 
   String _getCacheBuster() {
@@ -1315,10 +1309,22 @@ class _KeresoPanelState extends State {
                   children: [
                     const Text('📍 ', style: TextStyle(fontSize: 14)),
                     Expanded(
-                      child: Text(
-                        _keresHelyszin(item.elosztoNev),
-                        style: TextStyle(color: Colors.grey[800], fontSize: 14),
-                      ),
+                      child: _keresHelyszin(item.elosztoNev).isEmpty
+                          ? const Text(
+                              '?',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            )
+                          : Text(
+                              _keresHelyszin(item.elosztoNev),
+                              style: TextStyle(
+                                color: Colors.grey[800],
+                                fontSize: 14,
+                              ),
+                            ),
                     ),
                   ],
                 ),
