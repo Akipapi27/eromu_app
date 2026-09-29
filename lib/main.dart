@@ -133,7 +133,9 @@ class _KeresoPanelState extends State {
     try {
       final currentUrl = html.window.location.href.split('?').first;
       html.window.location.href =
-          '\(currentUrl?cb=\){DateTime.now().millisecondsSinceEpoch}';
+          currentUrl +
+          '?cb=' +
+          DateTime.now().millisecondsSinceEpoch.toString();
     } catch (_) {
       _adatbazisBetoltese();
     }
@@ -145,21 +147,24 @@ class _KeresoPanelState extends State {
 
     for (var item in _mindenAdat) {
       if (item.kod.trim().toUpperCase() == tisztaKeresett) {
-        if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
+        if (item.elosztoHelye.trim().isNotEmpty)
+          return item.elosztoHelye.trim();
         if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
       }
     }
 
     for (var item in _mindenAdat) {
       if (item.elosztoNev.trim().toUpperCase() == tisztaKeresett) {
-        if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
+        if (item.elosztoHelye.trim().isNotEmpty)
+          return item.elosztoHelye.trim();
         if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
       }
     }
 
     for (var item in _mindenAdat) {
       if (item.megnevezes.trim().toUpperCase().contains(tisztaKeresett)) {
-        if (item.elosztoHelye.trim().isNotEmpty) return item.elosztoHelye.trim();
+        if (item.elosztoHelye.trim().isNotEmpty)
+          return item.elosztoHelye.trim();
         if (item.helyszin.trim().isNotEmpty) return item.helyszin.trim();
       }
     }
@@ -198,8 +203,11 @@ class _KeresoPanelState extends State {
             'dec': '12',
           };
           final honap = honapok[honapNev.substring(0, 3)] ?? '01';
+          final napPad = nap.length == 1 ? '0' + nap : nap;
 
-          return DateTime.parse('\(ev-\)honap-\({nap.padLeft(2, '0')}T\){ido}Z');
+          return DateTime.parse(
+            ev + '-' + honap + '-' + napPad + 'T' + ido + 'Z',
+          );
         }
       } catch (_) {}
     }
@@ -211,23 +219,33 @@ class _KeresoPanelState extends State {
       final alapUrl = Uri.base
           .resolve('assets/eromu_adatbazis.json')
           .toString();
-      final urlKenszeritve = Uri.parse('\(alapUrl?v=\){_getCacheBuster()}');
+      final urlKenszeritve = Uri.parse(alapUrl + '?v=' + _getCacheBuster());
 
       final response = await http.get(urlKenszeritve);
 
       if (response.statusCode != 200) {
-        throw Exception('Szerver hiba: ${response.statusCode}');
+        throw Exception('Szerver hiba: ' + response.statusCode.toString());
       }
 
       if (response.headers['last-modified'] != null) {
         final parsedDate = _parseHttpDate(response.headers['last-modified']!);
         if (parsedDate != null) {
           final helyiIdo = parsedDate.toLocal();
+          final evStr = helyiIdo.year.toString();
+          final honapStr = helyiIdo.month.toString().padLeft(2, '0');
+          final napStr = helyiIdo.day.toString().padLeft(2, '0');
+          final oraStr = helyiIdo.hour.toString().padLeft(2, '0');
+          final percStr = helyiIdo.minute.toString().padLeft(2, '0');
           _utolsoFrissites =
-              '${helyiIdo.year}. '
-              '${helyiIdo.month.toString().padLeft(2, '0')}. '
-              '${helyiIdo.day.toString().padLeft(2, '0')}. '
-              '\({helyiIdo.hour.toString().padLeft(2, '0')}:\){helyiIdo.minute.toString().padLeft(2, '0')}';
+              evStr +
+              '. ' +
+              honapStr +
+              '. ' +
+              napStr +
+              '. ' +
+              oraStr +
+              ':' +
+              percStr;
         } else {
           _utolsoFrissites = 'Ismeretlen dátumformátum';
         }
@@ -235,9 +253,7 @@ class _KeresoPanelState extends State {
         _utolsoFrissites = 'Nem meghatározható';
       }
 
-      final jsonLista = jsonDecode(
-        utf8.decode(response.bodyBytes),
-      );
+      final jsonLista = jsonDecode(utf8.decode(response.bodyBytes));
       final list = (jsonLista as List)
           .map((item) => BerendezesAdat.fromJson(item))
           .toList();
@@ -251,7 +267,8 @@ class _KeresoPanelState extends State {
       });
     } catch (e) {
       setState(() {
-        _hibaUzenet = 'Nem sikerült betölteni az adatbázist!\nHiba: $e';
+        _hibaUzenet =
+            'Nem sikerült betölteni az adatbázist!\nHiba: ' + e.toString();
         _isLoading = false;
       });
     }
@@ -356,7 +373,7 @@ class _KeresoPanelState extends State {
       if (mounted && _kivalasztottBerendezes?.kod == item.kod) {
         if (kepek.isNotEmpty) {
           ui.platformViewRegistry.registerViewFactory(
-            'berendezes-thumb-$kodNev',
+            'berendezes-thumb-' + kodNev,
             (int viewId) {
               final img = html.ImageElement()
                 ..src = kepek.first
@@ -367,7 +384,7 @@ class _KeresoPanelState extends State {
 
               img.onClick.listen((_) {
                 if (mounted) {
-                  _galeriaInditasa(kodNev, 'Berendezés: ${item.megnevezes}');
+                  _galeriaInditasa(kodNev, 'Berendezés: ' + item.megnevezes);
                 }
               });
               return img;
@@ -432,12 +449,12 @@ class _KeresoPanelState extends State {
 
   _keresElerhetoKepet(String alapMappaUrl, String fajlNev) async {
     List verziok = [
-      '\(alapMappaUrl\)fajlNev.jpg',
-      '\(alapMappaUrl\)fajlNev.JPG',
-      '\(alapMappaUrl\){fajlNev.toLowerCase()}.jpg',
-      '\(alapMappaUrl\){fajlNev.toLowerCase()}.JPG',
-      '\(alapMappaUrl\){fajlNev.toLowerCase()}.webp',
-      '\(alapMappaUrl\){fajlNev.toLowerCase()}.png',
+      alapMappaUrl + fajlNev + '.jpg',
+      alapMappaUrl + fajlNev + '.JPG',
+      alapMappaUrl + fajlNev.toLowerCase() + '.jpg',
+      alapMappaUrl + fajlNev.toLowerCase() + '.JPG',
+      alapMappaUrl + fajlNev.toLowerCase() + '.webp',
+      alapMappaUrl + fajlNev.toLowerCase() + '.png',
     ];
 
     for (var url in verziok) {
@@ -463,16 +480,16 @@ class _KeresoPanelState extends State {
       tisztaAlapNev,
     );
     if (elsoTalalatUrl != null) {
-      talalatok.add('\(elsoTalalatUrl?v=\)buster');
+      talalatok.add(elsoTalalatUrl + '?v=' + buster);
     }
 
     for (int i = 1; i <= 9; i++) {
       final sorszamosUrl = await _keresElerhetoKepet(
         alapMappaUrl,
-        '\(tisztaAlapNev-\)i',
+        tisztaAlapNev + '-' + i.toString(),
       );
       if (sorszamosUrl != null) {
-        final teljesUrl = '\(sorszamosUrl?v=\)buster';
+        final teljesUrl = sorszamosUrl + '?v=' + buster;
         if (!talalatok.contains(teljesUrl)) {
           talalatok.add(teljesUrl);
         }
@@ -501,17 +518,13 @@ class _KeresoPanelState extends State {
     _galeriaMegnyitasa(letoltottUrlLista, cim, alapNev);
   }
 
-  void _galeriaMegnyitasa(
-    List kepurlEk,
-    String cim,
-    String egyediAzonosito,
-  ) {
+  void _galeriaMegnyitasa(List kepurlEk, String cim, String egyediAzonosito) {
     int aktualisIndex = 0;
     final TransformationController transformCtrl = TransformationController();
 
     void regisztralKepatmero(String url, int index) {
       ui.platformViewRegistry.registerViewFactory(
-        'html-image-\(egyediAzonosito-\)index',
+        'html-image-' + egyediAzonosito + '-' + index.toString(),
         (int viewId) => html.ImageElement()
           ..src = url
           ..style.objectFit = 'contain'
@@ -568,7 +581,9 @@ class _KeresoPanelState extends State {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                '\({aktualisIndex + 1} /\){kepurlEk.length}',
+                                (aktualisIndex + 1).toString() +
+                                    ' / ' +
+                                    kepurlEk.length.toString(),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -606,10 +621,16 @@ class _KeresoPanelState extends State {
                               maxScale: 10.0,
                               child: HtmlElementView(
                                 key: ValueKey(
-                                  'view-\(egyediAzonosito-\)aktualisIndex',
+                                  'view-' +
+                                      egyediAzonosito +
+                                      '-' +
+                                      aktualisIndex.toString(),
                                 ),
                                 viewType:
-                                    'html-image-\(egyediAzonosito-\)aktualisIndex',
+                                    'html-image-' +
+                                    egyediAzonosito +
+                                    '-' +
+                                    aktualisIndex.toString(),
                               ),
                             ),
                           ),
@@ -786,7 +807,9 @@ class _KeresoPanelState extends State {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Az adatbázisban jelenleg összesen ${_mindenAdat.length} db berendezés található.',
+                        'Az adatbázisban jelenleg összesen ' +
+                            _mindenAdat.length.toString() +
+                            ' db berendezés található.',
                         style: TextStyle(
                           color: Colors.blue[900],
                           fontWeight: FontWeight.bold,
@@ -804,7 +827,7 @@ class _KeresoPanelState extends State {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Legutóbbi adatbázis-frissítés: $_utolsoFrissites',
+                        'Legutóbbi adatbázis-frissítés: ' + _utolsoFrissites,
                         style: TextStyle(
                           color: Colors.blue[800],
                           fontSize: 12,
@@ -892,7 +915,9 @@ class _KeresoPanelState extends State {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            subtitle: Text('$db db leágazás található benne'),
+                            subtitle: Text(
+                              db.toString() + ' db leágazás található benne',
+                            ),
                             trailing: const Icon(
                               Icons.arrow_forward_ios,
                               size: 14,
@@ -992,7 +1017,7 @@ class _KeresoPanelState extends State {
                                 fontSize: 14,
                               ),
                             ),
-                            subtitle: Text('Elosztó: ${item.elosztoNev}'),
+                            subtitle: Text('Elosztó: ' + item.elosztoNev),
                             trailing: const Icon(
                               Icons.arrow_forward_ios,
                               size: 14,
@@ -1029,7 +1054,10 @@ class _KeresoPanelState extends State {
                       icon: const Icon(Icons.home, size: 16),
                       label: const Text(
                         'Kezdőlap',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -1049,8 +1077,11 @@ class _KeresoPanelState extends State {
                       onPressed: () => _elosztoKivalasztasa(_visszaElosztoNev!),
                       icon: const Icon(Icons.arrow_back, size: 16),
                       label: Text(
-                        'Elosztó [$_visszaElosztoNev]',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        'Elosztó [' + _visszaElosztoNev! + ']',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -1112,60 +1143,64 @@ class _KeresoPanelState extends State {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : (_vanBerendezesKep && _berendezesKepUrl != null
-                          ? Container(
-                              width: 150,
-                              height: 150,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Colors.blue[300]!,
-                                  width: 2,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.1),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: HtmlElementView(
-                                  key: ValueKey('thumb-$kodNev'),
-                                  viewType: 'berendezes-thumb-$kodNev',
-                                ),
-                              ),
-                            )
-                          : GestureDetector(
-                              onTap: () => _nincsKepUzenet(context),
-                              child: Container(
+                            ? Container(
                                 width: 150,
                                 height: 150,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey[100],
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: Colors.grey[300]!,
+                                    color: Colors.blue[300]!,
                                     width: 2,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.05),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.1,
+                                      ),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
                                   ],
                                 ),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.camera_alt,
-                                    size: 40,
-                                    color: Colors.grey[600],
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: HtmlElementView(
+                                    key: ValueKey('thumb-' + kodNev),
+                                    viewType: 'berendezes-thumb-' + kodNev,
                                   ),
                                 ),
-                              ),
-                            )),
+                              )
+                            : GestureDetector(
+                                onTap: () => _nincsKepUzenet(context),
+                                child: Container(
+                                  width: 150,
+                                  height: 150,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Colors.grey[300]!,
+                                      width: 2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.05,
+                                        ),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.camera_alt,
+                                      size: 40,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                              )),
                 ),
                 const SizedBox(height: 15),
                 Align(
@@ -1212,7 +1247,7 @@ class _KeresoPanelState extends State {
                     InkWell(
                       onTap: () => _elosztoKivalasztasa(item.elosztoNev),
                       child: Text(
-                        'Tápláló elosztó: ${item.elosztoNev} 🔗',
+                        'Tápláló elosztó: ' + item.elosztoNev + ' 🔗',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
@@ -1233,7 +1268,7 @@ class _KeresoPanelState extends State {
                             : (_vanElosztoKep
                                   ? () => _galeriaInditasa(
                                       elosztoNev,
-                                      'Elosztó: ${item.elosztoNev}',
+                                      'Elosztó: ' + item.elosztoNev,
                                     )
                                   : () => _nincsKepUzenet(context)),
                         icon: _elosztoKepToltodik
@@ -1282,10 +1317,7 @@ class _KeresoPanelState extends State {
                     Expanded(
                       child: Text(
                         _keresHelyszin(item.elosztoNev),
-                        style: TextStyle(
-                          color: Colors.grey[800],
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.grey[800], fontSize: 14),
                       ),
                     ),
                   ],
@@ -1296,7 +1328,7 @@ class _KeresoPanelState extends State {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Leágazás: ${item.leagazasJel}',
+                        'Leágazás: ' + item.leagazasJel,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.grey[700],
@@ -1315,7 +1347,7 @@ class _KeresoPanelState extends State {
                               : (_vanLeagazasKep
                                     ? () => _galeriaInditasa(
                                         leagazasNev,
-                                        'Leágazás: ${item.leagazasJel}',
+                                        'Leágazás: ' + item.leagazasJel,
                                       )
                                     : () => _nincsKepUzenet(context)),
                           icon: _leagazasKepToltodik
@@ -1369,7 +1401,7 @@ class _KeresoPanelState extends State {
                       border: Border.all(color: Colors.red[100]!),
                     ),
                     child: Text(
-                      'Szívás / Feljegyzés: ${item.feljegyzes}',
+                      'Szívás / Feljegyzés: ' + item.feljegyzes,
                       style: TextStyle(
                         color: Colors.red[900],
                         fontStyle: FontStyle.italic,
@@ -1481,7 +1513,7 @@ class _KeresoPanelState extends State {
                             : (_vanElosztoKep
                                   ? () => _galeriaInditasa(
                                       elosztoNev.toUpperCase(),
-                                      'Elosztó: $elosztoNev',
+                                      'Elosztó: ' + elosztoNev,
                                     )
                                   : () => _nincsKepUzenet(context)),
                         icon: _elosztoKepToltodik
@@ -1521,7 +1553,7 @@ class _KeresoPanelState extends State {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '📍  $elosztoHelye',
+                  '📍  ' + elosztoHelye,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -1529,7 +1561,7 @@ class _KeresoPanelState extends State {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '${leagazasok.length} leágazás',
+                  leagazasok.length.toString() + ' leágazás',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
@@ -1619,7 +1651,7 @@ class _KeresoPanelState extends State {
                                       color: Colors.blue[900],
                                     ),
                                   ),
-                                  const SizedBox(width: 4),
+                                  const SizedBox(width: 5),
                                   Icon(
                                     Icons.arrow_forward_ios,
                                     size: 12,
