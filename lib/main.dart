@@ -1670,15 +1670,22 @@ class _KeresoPanelState extends State {
                           children: [
                             const Text('📍 ', style: TextStyle(fontSize: 13)),
                             Expanded(
-                              child: Text(
-                                elem.helyszin.isNotEmpty
-                                    ? elem.helyszin
-                                    : 'Helyszín nincs megadva',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey[800],
-                                ),
-                              ),
+                              child: elem.helyszin.trim().isEmpty
+                                  ? const Text(
+                                      '?',
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                      ),
+                                    )
+                                  : Text(
+                                      elem.helyszin,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey[800],
+                                      ),
+                                    ),
                             ),
                           ],
                         ),
