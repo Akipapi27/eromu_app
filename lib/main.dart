@@ -1400,7 +1400,7 @@ class _KeresoPanelState extends State {
     String elosztoHelye = '';
 
     for (var item in _mindenAdat) {
-      if (item.kod.trim().toUpperCase() == tisztaEloszto) {
+      if (item.elosztoNev.trim().toUpperCase() == tisztaEloszto) {
         if (item.elosztoHelye.trim().isNotEmpty) {
           elosztoHelye = item.elosztoHelye.trim();
           break;
