@@ -143,9 +143,10 @@ class _KeresoPanelState extends State {
     if (kod.trim().isEmpty) return '';
     final tisztaKeresett = kod.trim().toUpperCase();
 
-    // Kizárólag az elosztó saját sorát keresjük (ahol a kód = elosztó név)
+    // Megkeressük a rekordokat, ahol az elosztoNev megegyezik,
+    // és ugyanebben a rekordban van elosztoHelye.
     for (var item in _mindenAdat) {
-      if (item.kod.trim().toUpperCase() == tisztaKeresett) {
+      if (item.elosztoNev.trim().toUpperCase() == tisztaKeresett) {
         if (item.elosztoHelye.trim().isNotEmpty) {
           return item.elosztoHelye.trim();
         }
