@@ -89,6 +89,7 @@ class _KeresoPanelState extends State {
   String? _kivalasztottElosztoNev;
   String? _visszaElosztoNev;
   String? _berendezesKepUrl;
+  String? _elosztoKepUrl;
 
   NezetTipus _aktualisNezet = NezetTipus.kereso;
 
@@ -323,13 +324,35 @@ class _KeresoPanelState extends State {
       _aktualisNezet = NezetTipus.elosztoAdatlap;
       _szurtElosztoLista = [];
       _vanElosztoKep = false;
+      _elosztoKepUrl = null;
       _elosztoKepToltodik = true;
     });
 
     _elerhetoKepekKeresese(elosztoNev.trim()).then((kepek) {
-      if (mounted) {
+      if (mounted && _kivalasztottElosztoNev == elosztoNev) {
+        if (kepek.isNotEmpty) {
+          final tiszta = elosztoNev.trim().toUpperCase();
+          ui.platformViewRegistry.registerViewFactory('eloszto-thumb-$tiszta', (
+            int viewId,
+          ) {
+            final img = html.ImageElement()
+              ..src = kepek.first
+              ..style.objectFit = 'cover'
+              ..style.width = '100%'
+              ..style.height = '100%'
+              ..style.cursor = 'pointer';
+
+            img.onClick.listen((_) {
+              if (mounted) {
+                _galeriaInditasa(tiszta, 'Elosztó: $elosztoNev');
+              }
+            });
+            return img;
+          });
+        }
         setState(() {
           _vanElosztoKep = kepek.isNotEmpty;
+          _elosztoKepUrl = kepek.isNotEmpty ? kepek.first : null;
           _elosztoKepToltodik = false;
         });
       }
@@ -1438,15 +1461,14 @@ class _KeresoPanelState extends State {
           ),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Column(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Row(
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Icon(Icons.bolt, size: 28, color: Colors.amber[900]),
@@ -1463,91 +1485,78 @@ class _KeresoPanelState extends State {
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Tooltip(
-                      message: _elosztoKepToltodik
-                          ? 'Képkeresés...'
-                          : (_vanElosztoKep
-                                ? 'Elosztó fotójának megtekintése'
-                                : 'Nincs még kép feltöltve'),
-                      child: ElevatedButton.icon(
-                        onPressed: _elosztoKepToltodik
-                            ? null
-                            : (_vanElosztoKep
-                                  ? () => _galeriaInditasa(
-                                      elosztoNev.toUpperCase(),
-                                      'Elosztó: $elosztoNev',
-                                    )
-                                  : () => _nincsKepUzenet(context)),
-                        icon: _elosztoKepToltodik
-                            ? const SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Icon(
-                                Icons.camera_alt,
-                                size: 18,
-                                color: _vanElosztoKep
-                                    ? Colors.amber[900]
-                                    : Colors.grey[600],
-                              ),
-                        label: Text(
-                          'Elosztó fotó',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: _vanElosztoKep
-                                ? Colors.amber[900]
-                                : Colors.grey[600],
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          const Text('📍 ', style: TextStyle(fontSize: 16)),
+                          Expanded(
+                            child: elosztoHelye.isEmpty
+                                ? const Text(
+                                    '?',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  )
+                                : Text(
+                                    elosztoHelye,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        '${leagazasok.length} leágazás',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[800],
                         ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _vanElosztoKep
-                              ? Colors.white
-                              : Colors.grey[200],
-                          elevation: _vanElosztoKep ? 2 : 0,
+                      ),
+                    ],
+                  ),
+                ),
+                if (_elosztoKepToltodik) ...[
+                  const SizedBox(width: 12),
+                  const SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ] else if (_vanElosztoKep && _elosztoKepUrl != null) ...[
+                  const SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: () =>
+                        _galeriaInditasa(tisztaEloszto, 'Elosztó: $elosztoNev'),
+                    child: Container(
+                      width: 130,
+                      height: 130,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.amber[300]!, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: HtmlElementView(
+                          key: ValueKey('eloszto-thumb-$tisztaEloszto'),
+                          viewType: 'eloszto-thumb-$tisztaEloszto',
                         ),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    const Text('📍 ', style: TextStyle(fontSize: 16)),
-                    Expanded(
-                      child: elosztoHelye.isEmpty
-                          ? const Text(
-                              '?',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            )
-                          : Text(
-                              elosztoHelye,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  '${leagazasok.length} leágazás',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
                   ),
-                ),
+                ],
               ],
             ),
           ),
