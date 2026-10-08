@@ -1442,22 +1442,29 @@ class _KeresoPanelState extends State {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Icon(Icons.bolt, size: 28, color: Colors.amber[900]),
-                        const SizedBox(width: 8),
-                        Text(
-                          elosztoNev,
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.amber[900],
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(Icons.bolt, size: 28, color: Colors.amber[900]),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              elosztoNev,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.amber[900],
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 12),
                     Tooltip(
                       message: _elosztoKepToltodik
                           ? 'Képkeresés...'
