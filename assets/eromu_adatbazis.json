@@ -1,53 +1,5 @@
 [
     {
-        "kod": "2CT04",
-        "megnevezes": "Égéslevegő ventilátor motor frekvenciaváltó transzformátora",
-        "helyszin": "2DB elosztó előterében",
-        "elosztoNev": "2BA",
-        "leagazasJel": "2BA01",
-        "elosztoHelye": "II. blokk, 0m, gépház és kazánház közötti átjáróban.",
-        "berendezesKep": null,
-        "elosztoKep": null,
-        "feljegyzes": null,
-        "verzio": 0
-    },
-    {
-        "kod": "2NG01D501_G01",
-        "megnevezes": "Égéslevegő ventilátor motor frekvenciaváltó",
-        "helyszin": "2DB elosztóban",
-        "elosztoNev": "2BA",
-        "leagazasJel": "2BA01",
-        "elosztoHelye": "II. blokk, 0m, gépház és kazánház közötti átjáróban.",
-        "berendezesKep": null,
-        "elosztoKep": null,
-        "feljegyzes": null,
-        "verzio": 0
-    },
-    {
-        "kod": "2NG01D501_M01",
-        "megnevezes": "Nyomóventilátor motor ",
-        "helyszin": "Kazánház, -3,8 szint, AB köz, Ny-i fal",
-        "elosztoNev": "2BA",
-        "leagazasJel": "2BA01",
-        "elosztoHelye": "II. blokk, 0m, gépház és kazánház közötti átjáróban.",
-        "berendezesKep": null,
-        "elosztoKep": null,
-        "feljegyzes": null,
-        "verzio": 0
-    },
-    {
-        "kod": "2CT03",
-        "megnevezes": "2CT03 Szívó ventilátor frekvenciaváltó tranformátora",
-        "helyszin": "2. filter alatt",
-        "elosztoNev": "2BA",
-        "leagazasJel": "2BA02",
-        "elosztoHelye": "II. blokk, 0m, gépház és kazánház közötti átjáróban.",
-        "berendezesKep": null,
-        "elosztoKep": null,
-        "feljegyzes": null,
-        "verzio": 0
-    },
-    {
         "kod": "6NC04S201",
         "megnevezes": "Dobürítő alap tolózár",
         "helyszin": "Kazánház , 7,5 m, 10. kazán ÉK-i sarok",
